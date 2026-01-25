@@ -2,7 +2,8 @@ import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunctions";
 import { zSchema } from "@/lib/zodSchema";
-import ProductModel from "@/models/Product.model";
+import CouponModel from "@/models/Coupon.model";
+
 
 
 export async function PUT(request) {
@@ -17,14 +18,10 @@ export async function PUT(request) {
 
     const schema = zSchema.pick({
       _id:true,
-      name: true,
-      slug: true,
-      category: true,
-      mrp: true,
-      sellingPrice: true,
+     code: true,
       discountPercentage: true,
-      description: true,
-      media: true,
+      minShoppingAmount: true,
+      validity: true,
     });
     const validate = schema.safeParse(payload);
     if (!validate.success) {
@@ -33,26 +30,23 @@ export async function PUT(request) {
 
     const validatedData = validate.data;
 
-    const getProduct = await ProductModel.findOne({
+    const getCoupon = await CouponModel.findOne({
       deletedAt: null,
       _id: validatedData._id,
     });
 
-    if (!getProduct) {
+    if (!getCoupon) {
       return response(false, 404, "Data not found");
     }
 
-    getProduct.name = validatedData.name;
-    getProduct.slug = validatedData.slug;
-    getProduct.category = validatedData.category;
-    getProduct.mrp = validatedData.mrp;
-    getProduct.sellingPrice = validatedData.sellingPrice;
-    getProduct.discountPercentage = validatedData.discountPercentage;
-    getProduct.description = validatedData.description;
-    getProduct.media = validatedData.media;
-    await getProduct.save();
+    getCoupon.code = validatedData.code;
+    getCoupon.discountPercentage = validatedData.discountPercentage;
+    getCoupon.minShoppingAmount = validatedData.minShoppingAmount;
+    getCoupon.validity = validatedData.validity;
 
-    return response(true, 200, "Product Updated successfully");
+    await getCoupon.save();
+
+    return response(true, 200, "Coupon Updated successfully");
   } catch (error) {
     return catchError(error);
   }
