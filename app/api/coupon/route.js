@@ -1,7 +1,8 @@
 import { isAuthenticated } from "@/lib/authentication";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunctions";
-import ProductModel from "@/models/Product.model";
+import CouponModel from "@/models/Coupon.model";
+
 
 import { NextResponse } from "next/server";
 
@@ -35,13 +36,12 @@ export async function GET(request){
         //Global search
         if(globalFilter){
             matchQuery["$or"] = [
-                {name: {$regex: globalFilter, $options: "i"}},
-                {slug: {$regex: globalFilter,$options:"i"}},
-                {"categoryData.name": {$regex: globalFilter,$options:"i"}},
+                {code: {$regex: globalFilter, $options: "i"}},
+               
                 {
                     $expr:{
                         $regexMatch:{
-                            input:{$toString:"$sellingPrice"},
+                            input:{$toString:"$minShoppingAmount"},
                             regex:globalFilter,
                             options:'i'
                         }
@@ -55,25 +55,19 @@ export async function GET(request){
                         }
                     }
                 },
-                {
-                    $expr:{
-                       $regexMatch:{
-                            input:{$toString:"$mrp"},
-                            regex:globalFilter,
-                            options:'i'
-                        }
-                    }
-                }
+                
             ]
         }
 
         //Column Filter
         filters.forEach(filter => {
-            if(filter.id === 'mrp' || filter.id === 'sellingPrice' ||
-                 filter.id === 'discountPercentage'){
+            if(filter.id === 'minShoppingAmount' || filter.id === 'discountPercentage'){
                     
                     matchQuery[filter.id] = Number(filter.value)
-            }else{
+            }else if(filter.id){
+                matchQuery[filter.id] = new Date(filter.value)
+            }
+            else{
                 matchQuery[filter.id] = {$regex: filter.value, $options: 'i'}
             }
             
@@ -89,19 +83,6 @@ export async function GET(request){
         //Aggregate pipeline
 
         const aggregatePipeline = [
-            {
-                $lookup:{
-                    from:'categories',
-                    localField:'category',
-                    foreignField:'_id',
-                    as:'categoryData'
-                }
-            },
-            {
-                $unwind:{
-                    path:"$categoryData",preserveNullAndEmptyArrays:true
-                }
-            },
             {$match: matchQuery},
             {$sort: Object.keys(sortQuery).length ? sortQuery : {createdAt: -1} },
             {$skip: start},
@@ -109,12 +90,10 @@ export async function GET(request){
             {
                 $project:{
                     _id:1,
-                    name:1,
-                    slug:1,
-                    mrp:1,
-                    sellingPrice:1,
+                    code:1,
                     discountPercentage:1,
-                    category:"$categoryData.name",
+                    minShoppingAmount:1,
+                    validity:1,
                     createdAt:1,
                     updatedAt:1,
                     deletedAt:1
@@ -124,14 +103,14 @@ export async function GET(request){
 
         //Execute query
 
-        const getProduct = await ProductModel.aggregate(aggregatePipeline);
+        const getCoupon = await CouponModel.aggregate(aggregatePipeline);
         
         //Get totalRowCount
-        const totalRowCount = await ProductModel.countDocuments(matchQuery);
+        const totalRowCount = await CouponModel.countDocuments(matchQuery);
         
         return NextResponse.json({
             success:true,
-            data:getProduct,
+            data:getCoupon,
             meta:{totalRowCount}
         })
 

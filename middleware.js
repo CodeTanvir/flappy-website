@@ -1,12 +1,17 @@
-import { NextResponse } from "next/server";
-import { USER_DASHBOARD, WEBSITE_LOGIN } from "./routes/WebsiteRoute";
 import { jwtVerify } from "jose";
+import { NextResponse } from "next/server";
 import { ADMIN_DASHBOARD } from "./routes/AdminPanelRoute";
+import { USER_DASHBOARD, WEBSITE_LOGIN, WEBSITE_REGISTER } from "./routes/WebsiteRoute";
 
 export async function middleware(request){
     try{
         const pathname = request.nextUrl.pathname
         const hasToken = request.cookies.has('access_token');
+
+        // Redirect root path to register page
+        if(pathname === '/'){
+            return NextResponse.redirect(new URL(WEBSITE_REGISTER, request.nextUrl))
+        }
 
         if(!hasToken){
             //if the user is not loggedin and trying to access a protected route,
@@ -45,5 +50,5 @@ export async function middleware(request){
 }
 
 export const config = {
-    matcher: ['/admin/:path*', '/my-account/:path*', '/auth/:path*']
+    matcher: ['/', '/admin/:path*', '/my-account/:path*', '/auth/:path*']
 }

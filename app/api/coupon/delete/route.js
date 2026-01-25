@@ -3,7 +3,8 @@ import { isAuthenticated } from "@/lib/authentication";
 
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunctions";
-import ProductModel from "@/models/Product.model";
+import CouponModel from "@/models/Coupon.model";
+
 
 
 
@@ -21,7 +22,7 @@ export async function PUT(request){
         if(!Array.isArray(ids) || ids.length === 0){
             return response(false, 400, 'Invalid or empty id list')
         }
-        const data = await ProductModel.find({_id: {$in: ids}}).lean();
+        const data = await CouponModel.find({_id: {$in: ids}}).lean();
         if(!data.length){
             return response(false, 404, 'Data not found')
         }
@@ -30,10 +31,10 @@ export async function PUT(request){
                 . Delete type should be SD or RSD for this route`)
         }
         if(deleteType === 'SD'){
-            await ProductModel.updateMany({_id: { $in:ids }},
+            await CouponModel.updateMany({_id: { $in:ids }},
                 {$set:{deletedAt: new Date().toISOString()}})
         }else{
-            await ProductModel.updateMany({_id: {$in: ids}},{$set: {deletedAt: null}})
+            await CouponModel.updateMany({_id: {$in: ids}},{$set: {deletedAt: null}})
         }
         return response(true, 200, deleteType === 'SD' ? 'Data moved into Trash' : "Data restored.")
     }catch(error){
@@ -43,7 +44,6 @@ export async function PUT(request){
 
 export async function DELETE(request){
   
-    
     try{
         const auth = await isAuthenticated('admin');
         if(!auth.isAuth){
@@ -56,7 +56,7 @@ export async function DELETE(request){
         if(!Array.isArray(ids) || ids.length === 0){
             return response(false, 400, 'Invalid or empty id list')
         }
-        const data = await ProductModel.find({ _id: {$in: ids} }).lean();
+        const data = await CouponModel.find({ _id: {$in: ids} }).lean();
         if(!data.length){
             return response(false, 404, 'Data not found')
         }
@@ -64,7 +64,7 @@ export async function DELETE(request){
             return response(false,400,`Invalid delete 
                 . Delete type should be PD for this route`)
         }
-       await ProductModel.deleteMany( {_id:{$in: ids} })
+       await CouponModel.deleteMany( {_id:{$in: ids} })
 
 
        return response(true,200,'Data deleted permenantly')

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   DT_CATEGORY_COLUMN,
+  DT_COUPON_COLUMN,
   DT_PRODUCT_COLUMN,
   DT_PRODUCT_VARIANT_COLUMN,
 } from "@/lib/column";
@@ -47,6 +48,13 @@ const TRASH_CONFIG = {
     exportUrl: "/api/product-variant/export",
     deleteUrl: "/api/product-variant/delete",
   },
+  coupon: {
+    title: "Coupon Trash",
+    columns: DT_COUPON_COLUMN,
+    fetchUrl: "/api/coupon",
+    exportUrl: "/api/coupon/export",
+    deleteUrl: "/api/coupon/delete",
+  },
 };
 
 function Trash() {
@@ -55,8 +63,9 @@ function Trash() {
   const config = TRASH_CONFIG[trashOf];
 
   const columns = useMemo(() => {
+    if (!config) return [];
     return columnConfig(config.columns, false, false, true);
-  }, [config.columns]);
+  }, [config?.columns]);
   const action = useCallback((row, deleteType, handleDelete) => {
     return [
       <DeleteAction
@@ -67,6 +76,10 @@ function Trash() {
       />,
     ];
   }, []);
+
+  if (!config) {
+    return <div>Invalid trash type</div>;
+  }
   return (
     <div>
       <BreadCrumb breadcrumbData={breadcrumbData} />

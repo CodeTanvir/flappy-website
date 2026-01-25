@@ -16,19 +16,9 @@ import { zSchema } from "@/lib/zodSchema";
 import { ADMIN_COUPON_SHOW, ADMIN_DASHBOARD } from "@/routes/AdminPanelRoute";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import slugify from "slugify";
-const MediaModal = dynamic(
-  () => import("@/components/Application/Admin/MediaModal"),
-  {
-    ssr: false,
-  },
-);
-const Editor = dynamic(() => import("@/components/Application/Admin/Editor"), {
-  ssr: false,
-});
 
 function AddCoupon() {
   const [loading, setLoading] = useState(false);
@@ -56,26 +46,18 @@ function AddCoupon() {
     { href: "", label: "Add Coupon" },
   ];
 
-  const nameValue = form.watch("name");
-  useEffect(() => {
-    const name = nameValue.toLowerCase();
-    if (name) {
-      form.setValue("slug", slugify(name));
-    }
-  }, [nameValue, form]);
-
   const onSubmit = async (values) => {
     setLoading(true);
     try {
       const { data: response } = await axios.post("/api/coupon/create", values);
       if (!response.success) {
-        throw new Error(response.message || "Failed to create category");
+        throw new Error(response.message);
       }
       form.reset();
 
-      showToast("success", response.message || "Product created successfully");
+      showToast("success", response.message);
     } catch (error) {
-      showToast("error", error?.message || "Something went wrong");
+      showToast("error", error?.message);
     } finally {
       setLoading(false);
     }
