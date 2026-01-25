@@ -1,0 +1,23 @@
+/* Add this line after root declaration in ckeditor5.css file */
+/* CKEditor Dark Mode */
+.ckeditor-dark .ck.ck-editor {
+  --ck-color-base-background: #020617;
+  --ck-color-base-foreground: #e5e7eb;
+
+  --ck-color-text: #e5e7eb;
+
+  --ck-color-toolbar-background: #020617;
+  --ck-color-toolbar-border: #1e293b;
+
+  --ck-color-panel-background: #020617;
+  --ck-color-panel-border: #1e293b;
+
+  --ck-color-input-background: #020617;
+  --ck-color-input-text: #e5e7eb;
+
+  --ck-color-focus-border: #38bdf8;
+  --ck-color-link-default: #38bdf8;
+
+  --ck-color-button-default-hover-background: #1e293b;
+  --ck-color-button-on-background: #0f172a;
+}
