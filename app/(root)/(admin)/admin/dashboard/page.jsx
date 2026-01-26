@@ -1,9 +1,11 @@
+import CountOverview from "./CountOverview";
+
 function AdminDashboard() {
-    return (
-        <div>
-            Admin Dashboard
-        </div>
-    )
+  return (
+    <div className="pt-5">
+      <CountOverview />
+    </div>
+  );
 }
 
 export default AdminDashboard;
