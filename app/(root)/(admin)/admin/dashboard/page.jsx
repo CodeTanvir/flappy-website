@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
 import CountOverview from "./CountOverview";
 import { OrderOverview } from "./OrderOverview";
+import { OrderStatus } from "./OrderStatus";
 import QuickAdd from "./QuickAdd";
 
 function AdminDashboard() {
@@ -25,7 +26,7 @@ function AdminDashboard() {
           </CardContent>
         </Card>
         <Card className="rounded-lg lg:w-[30%] w-full p-0">
-          <CardHeader className="py-3">
+          <CardHeader className="py-3 border [.border-b]:pb-3">
             <div className="flex justify-between items-center">
               <span className="font-semibold">Order Status</span>
               <Button type="button">
@@ -33,6 +34,9 @@ function AdminDashboard() {
               </Button>
             </div>
           </CardHeader>
+          <CardContent>
+            <OrderStatus />
+          </CardContent>
         </Card>
       </div>
     </div>

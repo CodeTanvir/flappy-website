@@ -46,7 +46,7 @@ export function OrderOverview() {
           />
           <ChartTooltip
             cursor={false}
-            content={<ChartTooltipContent hideLabel />}
+            content={<ChartTooltipContent  />}
           />
           <Bar dataKey="amount" fill="var(--color-amount)" radius={8} />
         </BarChart>
