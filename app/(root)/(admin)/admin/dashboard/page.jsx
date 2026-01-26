@@ -6,6 +6,9 @@ function AdminDashboard() {
     <div className="pt-5">
       <CountOverview />
       <QuickAdd />
+      <div className="mt-10 flex lg:flex-nowrap flex-warp gap-10">
+        
+      </div>
     </div>
   );
 }
