@@ -12,7 +12,7 @@ function AdminDashboard() {
       <QuickAdd />
       <div className="mt-10 flex lg:flex-nowrap flex-warp gap-10">
         <Card className="rounded-lg lg:w-[70%] w-full p-0">
-          <CardHeader className="py-3">
+          <CardHeader className="py-3 border [.border-b]:pb-3">
             <div className="flex justify-between items-center">
               <span className="font-semibold">Order Overview</span>
               <Button type="button">
