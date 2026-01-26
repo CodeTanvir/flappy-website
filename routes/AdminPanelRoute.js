@@ -25,6 +25,11 @@ export const ADMIN_COUPON_SHOW = '/admin/coupon';
 export const ADMIN_COUPON_ADD = '/admin/coupon/add';
 export const ADMIN_COUPON_EDIT = (id) => id ? `/admin/coupon/edit/${id}` : '';
 
+// Customer Routes
+export const ADMIN_CUSTOMERS_SHOW = '/admin/customers';
+export const ADMIN_CUSTOMERS_ADD = '/admin/customers/add';
+export const ADMIN_CUSTOMERS_EDIT = (id) => id ? `/admin/customers/edit/${id}` : ''; 
+
 
 // Trash Route
 export const ADMIN_TRASH = '/admin/trash';
