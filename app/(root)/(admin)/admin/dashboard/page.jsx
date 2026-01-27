@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
 import CountOverview from "./CountOverview";
 import LatestOrder from "./LatestOrder";
+import LatestReview from "./LatestReview";
 import { OrderOverview } from "./OrderOverview";
 import { OrderStatus } from "./OrderStatus";
 import QuickAdd from "./QuickAdd";
@@ -50,11 +51,11 @@ function AdminDashboard() {
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="pt-3">
+          <CardContent className="pt-3 lg:h-[350px] overflow-auto">
             <LatestOrder />
           </CardContent>
         </Card>
-        <Card className="rounded-lg lg:w-[30%] w-full p-0">
+        <Card className="rounded-lg lg:w-[30%] w-full p-0 block">
           <CardHeader className="py-3 border [.border-b]:pb-3">
             <div className="flex justify-between items-center">
               <span className="font-semibold">Latest Review</span>
@@ -63,7 +64,9 @@ function AdminDashboard() {
               </Button>
             </div>
           </CardHeader>
-          <CardContent></CardContent>
+          <CardContent className="pt-3 lg:h-[350px] overflow-auto">
+            <LatestReview />
+          </CardContent>
         </Card>
       </div>
     </div>
