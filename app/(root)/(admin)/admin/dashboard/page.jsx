@@ -64,7 +64,7 @@ function AdminDashboard() {
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="pt-3 lg:h-[350px] overflow-auto">
+          <CardContent className="pt-3 px-1 lg:h-[350px] overflow-auto">
             <LatestReview />
           </CardContent>
         </Card>
