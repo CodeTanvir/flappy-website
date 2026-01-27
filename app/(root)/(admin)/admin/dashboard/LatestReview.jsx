@@ -24,9 +24,9 @@ function LatestReview() {
           <TableRow key={i}>
             <TableCell className="flex items-center gap-3">
               <Avatar>
-                <AvatarImage src={userImage.src} />
-                <span className="line-clamp-1">Lorem ipsum dolor sit amet</span>
+                <AvatarImage src={ `https://github.com/shadcn.png` || userImage.src} />
               </Avatar>
+              <span className="line-clamp-1">Lorem ipsum dolor sit amet</span>
             </TableCell>
             <div className="flex items-center">
               {Array.from({ length: 5 }).map((_, i) => (
