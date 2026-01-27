@@ -29,7 +29,8 @@ function LatestReview() {
                 />
               </Avatar>
               <span className="line-clamp-1">Lorem ipsum dolor sit amet</span>
-
+            </TableCell>
+            <TableCell>
               <div className="flex items-center">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <span key={i}>
