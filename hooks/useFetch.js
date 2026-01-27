@@ -1,6 +1,6 @@
 const axios = require("axios")
 
-import { useState, useMemo, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const useFetch =(url, method = "GET", options = {})=>{
     const [data, setData] = useState(null);
@@ -8,24 +8,19 @@ const useFetch =(url, method = "GET", options = {})=>{
     const [error, setError] = useState(null);
     const [refreshIndex, setRefeshIndex] = useState(0);
 
-    const optionsString = JSON.stringify(options)
-    const requestOptions = useMemo(()=>{
-        const opts = {...options};
-        if(method === 'POST' && !opts.data){
-            opts.data = {}
-        }
-        return opts;
-    },[method, optionsString]);
-
     useEffect(()=>{
         const apiCall = async()=>{
             setLoading(true);
             setError(null);
             try{
+                const opts = {...options};
+                if(method === 'POST' && !opts.data){
+                    opts.data = {}
+                }
                 const {data: response} = await axios({
                     url,
                     method,
-                    ...(requestOptions)
+                    ...opts
                 })
                 if(!response.success){
                     throw new Error(response.message)
@@ -39,7 +34,7 @@ const useFetch =(url, method = "GET", options = {})=>{
         }
 
     apiCall()
-    },[url, refreshIndex, requestOptions])
+    },[url, refreshIndex, method, options])
 
 
     const refetch = () => {
