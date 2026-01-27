@@ -54,6 +54,7 @@ function SearchModel({ open, setOpen }) {
                 <Link
                   href={item.url}
                   className="block py-2 px-3 rounded hover:bg-muted"
+                  onClick={()=> setOpen(false)}
                 >
                   <h4 className="font-medium">{item.label}</h4>
                   <p className="text-sm text-muted-foreground">
@@ -62,6 +63,11 @@ function SearchModel({ open, setOpen }) {
                 </Link>
               </li>
             ))}
+            {query && results.length === 0 && 
+            <div className="text-sm text-center text-red-500">
+                No Result Found
+            </div>
+            }
           </ul>
         </DialogContent>
       </Dialog>
