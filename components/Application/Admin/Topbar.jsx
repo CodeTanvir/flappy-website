@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import { RiMenu4Fill } from "react-icons/ri";
+import AdminSearch from "./AdminSearch";
 import ThemeSwitch from "./ThemeSwitch";
 import UserDropdown from "./UserDropdown";
 
@@ -17,7 +18,9 @@ function Topbar() {
             items-center
              bg-white dark:bg-card"
     >
-      <div>search component</div>
+      <div>
+        <AdminSearch />
+      </div>
 
       <div className="flex items-center gap-2">
         <ThemeSwitch />
