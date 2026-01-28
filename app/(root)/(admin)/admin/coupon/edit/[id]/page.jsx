@@ -27,7 +27,7 @@ function EditCoupon({ params }) {
   const { data: getCouponData } = useFetch(`/api/coupon/get/${id}`);
 
   const formSchema = zSchema.pick({
-    _id:true,
+    _id: true,
     code: true,
     discountPercentage: true,
     minShoppingAmount: true,
@@ -37,7 +37,7 @@ function EditCoupon({ params }) {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      _id:id,
+      _id: id,
       code: "",
       discountPercentage: "",
       minShoppingAmount: "",
@@ -90,7 +90,7 @@ function EditCoupon({ params }) {
         <CardContent className="py-2 pt-6 pb-5">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
-              <div className="grid md:grid-cols-2 gap-5">
+              <div className="grid md:grid-cols-2  grid-cols-1 gap-5">
                 <div className="mb-3">
                   <FormField
                     control={form.control}
