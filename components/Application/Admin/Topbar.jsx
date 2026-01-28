@@ -1,11 +1,14 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
+import { logoBlack } from "@/public/assets/images/flappy.png";
+import { logoWhite } from "@/public/assets/images/flappy1.png";
+import Image from "next/image";
 import { RiMenu4Fill } from "react-icons/ri";
+import AdminMobileSearch from "./AdminMobileSearch";
 import AdminSearch from "./AdminSearch";
 import ThemeSwitch from "./ThemeSwitch";
 import UserDropdown from "./UserDropdown";
-
 function Topbar() {
   const { toggleSidebar } = useSidebar();
   return (
@@ -18,11 +21,28 @@ function Topbar() {
             items-center
              bg-white dark:bg-card"
     >
-      <div>
+      <div className="flex items-center md:hidden">
+        <Image
+          src={logoBlack.src}
+          height={50}
+          width={logoBlack.width}
+          className="block dark:hidden h-[50px] w-auto"
+          alt="logo dark"
+        />
+        <Image
+          src={logoWhite.src}
+          height={50}
+          width={logoWhite.width}
+          className="hidden dark:block h-[50px] w-auto"
+          alt="logo white"
+        />
+      </div>
+      <div className="md:block hidden">
         <AdminSearch />
       </div>
 
       <div className="flex items-center gap-2">
+        <AdminMobileSearch />
         <ThemeSwitch />
         <UserDropdown />
         <Button
