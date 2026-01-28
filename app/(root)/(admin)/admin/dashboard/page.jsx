@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
@@ -13,7 +15,7 @@ function AdminDashboard() {
     <div className="pt-5">
       <CountOverview />
       <QuickAdd />
-      <div className="mt-10 flex lg:flex-nowrap flex-warp gap-10">
+      <div className="mt-10 flex lg:flex-nowrap flex-wrap gap-10">
         <Card className="rounded-lg lg:w-[70%] w-full p-0">
           <CardHeader className="py-3 border [.border-b]:pb-3">
             <div className="flex justify-between items-center">
@@ -41,7 +43,7 @@ function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
-      <div className="mt-10 flex lg:flex-nowrap flex-warp gap-10">
+      <div className="mt-10 flex lg:flex-nowrap flex-wrap gap-10">
         <Card className="rounded-lg lg:w-[70%] w-full p-0 block">
           <CardHeader className="py-3 border [.border-b]:pb-3">
             <div className="flex justify-between items-center">

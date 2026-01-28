@@ -1,8 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
-import { logoBlack } from "@/public/assets/images/flappy.png";
-import { logoWhite } from "@/public/assets/images/flappy1.png";
+import logoBlack from "@/public/assets/images/flappy.png";
+import logoWhite from "@/public/assets/images/flappy1.png";
 import Image from "next/image";
 import { RiMenu4Fill } from "react-icons/ri";
 import AdminMobileSearch from "./AdminMobileSearch";

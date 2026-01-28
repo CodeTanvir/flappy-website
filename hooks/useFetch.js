@@ -1,6 +1,6 @@
 const axios = require("axios")
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const useFetch =(url, method = "GET", options = {})=>{
     const [data, setData] = useState(null);
@@ -34,12 +34,13 @@ const useFetch =(url, method = "GET", options = {})=>{
         }
 
     apiCall()
-    },[url, refreshIndex, method, options])
+    },[url, refreshIndex, method, JSON.stringify(options)])
 
 
-    const refetch = () => {
+    const refetch = useCallback(() => {
         setRefeshIndex(prev => prev+1)
-    }
+    }, [])
+    
     return {data, loading, error, refetch}
 }
 
