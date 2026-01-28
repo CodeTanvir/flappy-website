@@ -23,14 +23,14 @@ function Topbar() {
     >
       <div className="flex items-center md:hidden">
         <Image
-          src={logoBlack.src}
+          src={logoBlack}
           height={50}
           width={logoBlack.width}
           className="block dark:hidden h-[50px] w-auto"
           alt="logo dark"
         />
         <Image
-          src={logoWhite.src}
+          src={logoWhite}
           height={50}
           width={logoWhite.width}
           className="hidden dark:block h-[50px] w-auto"
