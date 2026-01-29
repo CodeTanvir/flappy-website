@@ -1,7 +1,7 @@
 import { jwtVerify } from "jose";
 import { NextResponse } from "next/server";
 import { ADMIN_DASHBOARD } from "./routes/AdminPanelRoute";
-import { USER_DASHBOARD, WEBSITE_LOGIN, WEBSITE_REGISTER } from "./routes/WebsiteRoute";
+import { USER_DASHBOARD, WEBSITE_LOGIN } from "./routes/WebsiteRoute";
 
 export async function middleware(request){
     try{
@@ -9,9 +9,9 @@ export async function middleware(request){
         const hasToken = request.cookies.has('access_token');
 
         // Redirect root path to register page
-        if(pathname === '/'){
-            return NextResponse.redirect(new URL(WEBSITE_REGISTER, request.nextUrl))
-        }
+        // if(pathname === '/'){
+        //     return NextResponse.redirect(new URL(WEBSITE_REGISTER, request.nextUrl))
+        // }
 
         if(!hasToken){
             //if the user is not loggedin and trying to access a protected route,
