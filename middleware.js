@@ -8,10 +8,8 @@ export async function middleware(request){
         const pathname = request.nextUrl.pathname
         const hasToken = request.cookies.has('access_token');
 
-        // Redirect root path to register page
-        // if(pathname === '/'){
-        //     return NextResponse.redirect(new URL(WEBSITE_REGISTER, request.nextUrl))
-        // }
+       
+       
 
         if(!hasToken){
             //if the user is not loggedin and trying to access a protected route,
@@ -50,5 +48,5 @@ export async function middleware(request){
 }
 
 export const config = {
-    matcher: ['/', '/admin/:path*', '/my-account/:path*', '/auth/:path*']
+    matcher: ['/admin/:path*', '/my-account/:path*', '/auth/:path*']
 }
