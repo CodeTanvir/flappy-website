@@ -5,6 +5,7 @@ import MediaModel from "@/models/Media.model";
 import ProductModel from "@/models/Product.model";
 MediaModel
 
+export const dynamic = 'force-dynamic';
 export async function GET(){
     try{
        
