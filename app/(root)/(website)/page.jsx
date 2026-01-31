@@ -1,3 +1,4 @@
+import FeaturedProduct from "@/components/Application/website/FeaturedProduct";
 import MainSlider from "@/components/Application/website/MainSlider";
 import banner1 from "@/public/assets/images/banner1.png";
 import banner2 from "@/public/assets/images/banner2.png";
@@ -36,6 +37,7 @@ function page() {
           </div>
         </div>
       </section>
+      <FeaturedProduct />
     </>
   );
 }
