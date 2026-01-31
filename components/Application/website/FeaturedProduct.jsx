@@ -1,12 +1,13 @@
-import axios from "axios";
 import Link from "next/link";
 import { IoIosArrowRoundForward } from "react-icons/io";
 import ProductBox from "./ProductBox";
 
 async function FeaturedProduct() {
-  const { data: productData } = await axios.get(
+  const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/product/get-featured-product`,
+    { cache: "no-store" },
   );
+  const productData = await res.json();
 
   return (
     <section className="lg:px-32 px-4 sm:py-10">
