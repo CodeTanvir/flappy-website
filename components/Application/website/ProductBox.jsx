@@ -1,10 +1,11 @@
 import ImagePlaceholder from "@/public/assets/images/img-placeholder.webp";
+import { WEBSITE_PRODUCT_DETAILS } from "@/routes/WebsiteRoute";
 import Image from "next/image";
 import Link from "next/link";
 function ProductBox({ product }) {
   return (
     <div className="rounded-lg hover:shadow-lg border overflow-hidden">
-      <Link href="">
+      <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)}>
         <Image
           src={product?.media[0]?.secure_url || ImagePlaceholder.src}
           width={400}
