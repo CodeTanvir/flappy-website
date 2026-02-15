@@ -26,7 +26,7 @@ async function ProductPage({ params, searchParams }) {
           variant={getProduct?.data?.variant}
           colors={getProduct?.data?.colors}
           sizes={getProduct?.data?.sizes}
-          reviewCount={getProduct?.data?.sizes}
+          reviewCount={getProduct?.data?.reviewCount}
         />
       </div>
     );

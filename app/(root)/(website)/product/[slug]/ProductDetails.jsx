@@ -1,4 +1,6 @@
 "use client";
+import { ButtonLoading } from "@/components/Application/ButtonLoading";
+import ProductReview from "@/components/Application/website/ProductReview";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,17 +8,50 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { showToast } from "@/lib/showToast";
 import ImagePlaceholder from "@/public/assets/images/img-placeholder.webp";
-import { WEBSITE_PRODUCT_DETAILS, WEBSITE_SHOP } from "@/routes/WebsiteRoute";
+import loadingSvg from "@/public/assets/images/loading.svg";
+import {
+  WEBSITE_CART,
+  WEBSITE_PRODUCT_DETAILS,
+  WEBSITE_SHOP,
+} from "@/routes/WebsiteRoute";
+import { addIntoCart } from "@/store/reducer/cartReducer";
+import { decode, encode } from "entities";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-
+import { HiMinus, HiPlus } from "react-icons/hi2";
+import { IoStar } from "react-icons/io5";
+import { useDispatch, useSelector } from "react-redux";
 function ProductDetails({ product, variant, colors, sizes, reviewCount }) {
+  const dispatch = useDispatch();
+  const cartStore = useSelector((store) => store.cartStore);
   const [activeThumb, setActiveThumb] = useState();
-  console.log(variant);
+  const [qty, setQty] = useState(1);
+  const [isAddIntoCart, setIsAddedIntoCart] = useState(false);
+  const [isProductLoading, setIsProductLoading] = useState(false);
+
   useEffect(() => {
     setActiveThumb(variant?.media[0].secure_url);
+  }, [variant]);
+
+  useEffect(() => {
+    if (cartStore.count > 0) {
+      const existingProduct = cartStore.products.findIndex(
+        (cartProduct) =>
+          cartProduct.productId === product._id &&
+          cartProduct.variantId === variant._id,
+      );
+
+      if (existingProduct >= 0) {
+        setIsAddedIntoCart(true);
+      } else {
+        setIsAddedIntoCart(false);
+      }
+    }
+    setIsProductLoading(false);
   }, [variant]);
 
   const handleThumb = (thumbUrl) => {
@@ -24,8 +59,41 @@ function ProductDetails({ product, variant, colors, sizes, reviewCount }) {
     setActiveThumb(thumbUrl);
   };
 
+  const handleQty = (actionType) => {
+    if (actionType === "inc") {
+      setQty((prev) => prev + 1);
+    } else {
+      if (qty !== 1) {
+        setQty((prev) => prev - 1);
+      }
+    }
+  };
+
+  const handleAddToCart = () => {
+    const cartProduct = {
+      productId: product._id,
+      variantId: variant._id,
+      name: product.name,
+      url: product.slug,
+      size: variant.size,
+      color: variant.color,
+      mrp: variant.mrp,
+      sellingPrice: variant.sellingPrice,
+      media: variant?.media[0]?.secure_url,
+      qty: qty,
+    };
+    dispatch(addIntoCart(cartProduct));
+    setIsAddedIntoCart(true);
+    showToast("success", "Product added into cart");
+  };
+
   return (
     <div className="lg:px-32 px-4">
+      {isProductLoading && (
+        <div className="fixed top-10 left-1/2 -translate-x-1/2 z-50">
+          <Image src={loadingSvg} height={80} width={80} alt="loading" />
+        </div>
+      )}
       <div className="my-10">
         <Breadcrumb>
           <BreadcrumbList>
@@ -75,7 +143,129 @@ function ProductDetails({ product, variant, colors, sizes, reviewCount }) {
             ))}
           </div>
         </div>
+        <div className="md:w-1/2 md:mt-0 mt-5">
+          <h1 className="text-3xl font-semibold mb-2">{product.name}</h1>
+          <div className="flex items-center gap-1 mb-5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <IoStar key={i} />
+            ))}
+            <span className="text-sm ps-2">({reviewCount} Reviews)</span>
+          </div>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xl font-semibold">
+              {variant.sellingPrice.toLocaleString("en-BD", {
+                style: "currency",
+                currency: "BDT",
+              })}
+            </span>
+            <span className="text-xs text-gray-500 font-semibold line-through">
+              {variant.mrp.toLocaleString("en-BD", {
+                style: "currency",
+                currency: "BDT",
+              })}
+              s
+            </span>
+
+            <span className="bg-red-500 rounded-2xl px-3 py-1 text-white text-xs ms-5">
+              -{variant.discountPercentage}%
+            </span>
+          </div>
+          <div
+            dangerouslySetInnerHTML={{ __html: decode(product.description) }}
+          ></div>
+          <div className="mt-5">
+            <p className="mb-2">
+              <span className="font-semibold"> Color: </span>
+              {variant?.color}
+            </p>
+            <div className="flex gap-5 ">
+              {colors.map((color) => (
+                <Link
+                  onClick={() => setIsProductLoading(true)}
+                  key={color}
+                  href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${color}&size=${variant.size}`}
+                  className={`border py-1 px-3 rounded-lg cursor-pointer hover:bg-primary hover:text-white ${color === variant.color ? "bg-primary text-white" : ""}`}
+                >
+                  {color}
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="mt-5">
+            <p className="mb-2">
+              <span className="font-semibold"> Size: </span>
+              {variant?.size}
+            </p>
+            <div className="flex gap-5 ">
+              {sizes.map((size) => (
+                <Link
+                  onClick={() => setIsProductLoading(true)}
+                  key={size}
+                  href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${variant.color}&size=${size}`}
+                  className={`border py-1 px-3 rounded-lg cursor-pointer hover:bg-primary hover:text-white ${size === variant.size ? "bg-primary text-white" : ""}`}
+                >
+                  {size}
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="mt-5">
+            <p className="font-bold mb-2">Quantity</p>
+            <div className="flex items-center h-10 border w-fit rounded-full">
+              <button
+                type="button"
+                className="h-full w-10 flex justify-center items-center"
+                onClick={() => handleQty("desc")}
+              >
+                <HiMinus />
+              </button>
+              <input
+                type="text"
+                value={qty}
+                className="w-14 text-center border-none outline-offset-0"
+              />
+              <button
+                type="button"
+                className="h-full w-10 flex justify-center items-center"
+                onClick={() => handleQty("inc")}
+              >
+                <HiPlus />
+              </button>
+            </div>
+          </div>
+          <div className="mt-5">
+            {!isAddIntoCart ? (
+              <ButtonLoading
+                type="button"
+                text="Add To Cart"
+                className="w-full rounded-full py-6 text-md cursor-pointer"
+                onClick={handleAddToCart}
+              />
+            ) : (
+              <Button
+                className="w-full rounded-full py-6 text-md cursor-pointer"
+                type="button"
+                asChild
+              >
+                <Link href={WEBSITE_CART}>Go To Cart</Link>
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
+      <div className="mb-10">
+        <div className="shadow rounded border">
+          <div className="p-3 bg-gray-50 border-b">
+            <h2 className="font-semibold text-2xl">Product Description</h2>
+          </div>
+          <div className="p-3">
+            <div
+              dangerouslySetInnerHTML={{ __html: encode(product.description) }}
+            ></div>
+          </div>
+        </div>
+      </div>
+      <ProductReview productId={product._id} />
     </div>
   );
 }
