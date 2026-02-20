@@ -1,5 +1,6 @@
 "use client";
 import { ButtonLoading } from "@/components/Application/ButtonLoading";
+import Payment from "@/components/Application/website/Payment";
 import WebsiteBreadcrumb from "@/components/Application/website/WebsiteBreadcrumb";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,6 +53,7 @@ function Checkout() {
   const [totalAmount, setTotalAmount] = useState(0);
   const [couponCode, setCouponCode] = useState("");
   const [placingOrder, setPlacingOrder] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("cod");
   useEffect(() => {
     if (getVerifiedCartData && getVerifiedCartData.success) {
       const cartData = getVerifiedCartData.data;
@@ -126,15 +128,37 @@ function Checkout() {
       phone: true,
       district: true,
       street: true,
-      zipcode: true,
-      ordernote: true,
     })
     .extend({
+      paymentMethod: z.enum(["cod", "bkash"]),
       userId: z.string().optional(),
+      bkashPhone: z.string().optional(),
+      trxId: z.string().optional(),
+      zipcode: z.string().optional(),
+      ordernote: z.string().optional(),
+    })
+    .superRefine((data, ctx) => {
+      if (data.paymentMethod === "bkash") {
+        if (!data.bkashPhone) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["bkashPhone"],
+            message: "bkash phone number is required",
+          });
+        }
+        if (!data.trxId) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["trxId"],
+            message: "Transaction ID is required",
+          });
+        }
+      }
     });
   const orderForm = useForm({
     resolver: zodResolver(orderFormSchema),
     defaultValues: {
+      paymentMethod: "cod",
       name: "",
       email: "",
       phone: "",
@@ -145,9 +169,55 @@ function Checkout() {
       userId: auth?._id,
     },
   });
+
+  useEffect(() => {
+    orderForm.setValue("paymentMethod", paymentMethod);
+  }, [orderForm, paymentMethod]);
+
+  // get order id by payment
+  const getOrderId = async (amount) => {
+    try {
+      const { data: orderIdData } = await axios.post(
+        "/api/payment/get-order-id",
+        { amount },
+      );
+      if (!orderIdData.success) {
+        throw new Error(orderIdData.data);
+      }
+      return { success: true, order_id: orderIdData.data };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  };
+
+  //place holder action
   const placeOrder = async (formData) => {
     setPlacingOrder(true);
     try {
+      const products = verifiedCartData.map((cartItem) => ({
+        productId: cartItem.productId,
+        variantId: cartItem.variantId,
+        name: cartItem.name,
+        qty: cartItem.qty,
+        mrp: cartItem.mrp,
+        sellingPrice: cartItem.sellingPrice,
+      }));
+      const { data: paymentResponseData } = await axios.post(
+        "/api/payment/save-order",
+        {
+          ...formData,
+          products: products,
+          subtotal: subtotal,
+          discount: discount,
+          couponDiscountAmount: couponDiscountAmount,
+          totalAmount: totalAmount,
+        },
+      );
+      const generateOrderId = await getOrderId(totalAmount);
+      if (!generateOrderId.success) {
+        throw new Error(generateOrderId.message);
+      }
+      const order_id = generateOrderId.order_Id;
     } catch (error) {
       showToast("error", error.message);
     } finally {
@@ -213,7 +283,8 @@ function Checkout() {
                   </div>
                   <div className="mb-3">
                     <FormField
-                      name="phne"
+                      type="number"
+                      name="phone"
                       control={orderForm.control}
                       render={({ field }) => (
                         <FormItem>
@@ -266,7 +337,7 @@ function Checkout() {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Input placeholder="Enter zipcode" />
+                            <Input {...field} placeholder="Enter zipcode" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -281,13 +352,25 @@ function Checkout() {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Textarea placeholder="Enter your Order Note" />
+                            <Textarea
+                              {...field}
+                              placeholder="Enter your Order Note"
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     ></FormField>
                   </div>
+                  <div className="mb-3 col-span-2">
+                    <Payment
+                      paymentMethod={paymentMethod}
+                      setPaymentMethod={setPaymentMethod}
+                      register={orderForm.register}
+                      errors={orderForm.formState.errors}
+                    />
+                  </div>
+
                   <div className="mb-3">
                     <ButtonLoading
                       loading={placingOrder}
