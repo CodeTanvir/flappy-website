@@ -68,6 +68,11 @@ function Checkout() {
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const [gettingLocation, setGettingLocation] = useState(false);
 
+  // Use cart.products as the source of truth for verified cart data
+  // This ensures products persist after page reload since Redux is persisted to localStorage
+  const displayCartData =
+    verifiedCartData.length > 0 ? verifiedCartData : cart.products;
+
   useEffect(() => {
     if (getVerifiedCartData && getVerifiedCartData.success) {
       const cartData = getVerifiedCartData.data;
@@ -241,9 +246,10 @@ function Checkout() {
 
   //place holder action
   const placeOrder = async (formData) => {
+    setSavingOrder(true);
     setPlacingOrder(true);
     try {
-      const products = verifiedCartData.map((cartItem) => ({
+      const products = displayCartData.map((cartItem) => ({
         productId: cartItem.productId,
         variantId: cartItem.variantId,
         name: cartItem.name,
@@ -463,8 +469,8 @@ function Checkout() {
               <div>
                 <table className="w-full border">
                   <tbody>
-                    {verifiedCartData &&
-                      verifiedCartData?.map((product) => (
+                    {displayCartData &&
+                      displayCartData?.map((product) => (
                         <tr key={product.variantId}>
                           <td className="p-3">
                             <div className="flex items-center gap-5">

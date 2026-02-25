@@ -4,6 +4,7 @@ import { catchError, response } from "@/lib/helperFunctions";
 import { sendMail } from "@/lib/sendMail";
 import { zSchema } from "@/lib/zodSchema";
 import Order from "@/models/Order.model";
+import ProductVariantModel from "@/models/ProductVariant.model";
 import z from "zod";
 
 export async function POST(request) {
@@ -11,7 +12,7 @@ export async function POST(request) {
     await connectDB();
 
     const payload = await request.json();
-console.log(payload)
+
     const productSchema = z.object({
       productId: z.string().length(24, "Invalid product id format"),
       variantId: z.string().length(24, "Invalid variant id format"),
@@ -79,18 +80,62 @@ console.log(payload)
       zipcode,
       ordernote,
       products,
-      subtotal,
-      discount,
       couponDiscountAmount,
-      totalAmount,
       paymentMethod,
       bkashPhone,
       trxId,
     } = validatedData;
 
-    const bkash = paymentMethod === "bkash"
-      ? { phoneNumber: bkashPhone, trxId }
-      : undefined;
+    // ✅ SECURITY: Verify all products exist and recalculate amounts on server
+    // This prevents clients from tampering with prices or quantities
+    const verifiedProducts = await Promise.all(
+      products.map(async (item) => {
+        const variant = await ProductVariantModel.findById(item.variantId)
+          .populate("product")
+          .lean();
+
+        if (!variant) {
+          throw new Error(`Variant ${item.variantId} not found or invalid`);
+        }
+
+        // Verify the product data matches database (prevents price tampering)
+        if (variant.mrp !== item.mrp || variant.sellingPrice !== item.sellingPrice) {
+          throw new Error(
+            `Price mismatch for ${item.name}. Possible tampering detected.`
+          );
+        }
+
+        return {
+          productId: variant.product._id,
+          variantId: variant._id,
+          name: variant.product.name,
+          qty: item.qty,
+          mrp: variant.mrp,
+          sellingPrice: variant.sellingPrice,
+        };
+      })
+    );
+
+    // ✅ SECURITY: Recalculate all totals on server (don't trust client values)
+    const recalculatedSubtotal = verifiedProducts.reduce(
+      (sum, product) => sum + product.sellingPrice * product.qty,
+      0
+    );
+
+    const recalculatedDiscount = verifiedProducts.reduce(
+      (sum, product) =>
+        sum + (product.mrp - product.sellingPrice) * product.qty,
+      0
+    );
+
+    // Use server-calculated values, not client values
+    const recalculatedTotalAmount =
+      recalculatedSubtotal - couponDiscountAmount;
+
+    const bkash =
+      paymentMethod === "bkash"
+        ? { phoneNumber: bkashPhone, trxId }
+        : undefined;
 
     let order;
     let created = false;
@@ -106,15 +151,14 @@ console.log(payload)
           street,
           zipcode,
           ordernote,
-          products,
-          subtotal,
-          discount,
-          couponDiscountAmount,
-          totalAmount,
+          products: verifiedProducts,
+          subtotal: recalculatedSubtotal,
+          discount: recalculatedDiscount,
+          couponDiscountAmount: couponDiscountAmount,
+          totalAmount: recalculatedTotalAmount,
           paymentMethod,
-          bkash,                    // ← correct – nested object
+          bkash,
           paymentStatus: "pending",
-          // DO NOT pass trxId or bkashPhone here
         });
 
         created = true;
@@ -127,20 +171,23 @@ console.log(payload)
       }
     }
 
-    try{
-       const mailData = {
-      order_id: order.orderId,
-      orderDetailsUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/order-details/${order_id}`
+    try {
+      const mailData = {
+        order_id: order.orderId,
+        orderDetailsUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/order-details/${order.orderId}`,
+      };
+      await sendMail(
+        "Order placed successfully",
+        email,
+        orderNotification(mailData)
+      );
+    } catch (error) {
+      console.log("Email sending failed:", error);
     }
-    await sendMail('Order placed successfully', validatedData.email,orderNotification(mailData))
-    }catch(error){
-
-    }
-   
 
     return response(true, 201, "Order created successfully");
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return catchError(error);
   }
 }
