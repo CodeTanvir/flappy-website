@@ -14,7 +14,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import useFetch from "@/hooks/useFetch";
-import { response } from "@/lib/helperFunctions";
 import { showToast } from "@/lib/showToast";
 import { zSchema } from "@/lib/zodSchema";
 import {
@@ -274,7 +273,8 @@ function Checkout() {
         showToast("success", paymentResponseData.message);
         dispatch(clearCart());
         orderForm.reset();
-        router.push(WEBSITE_ORDER_DETAILS(response.orderId));
+
+        router.push(WEBSITE_ORDER_DETAILS(paymentResponseData.data.orderId));
         setSavingOrder(false);
       }
     } catch (error) {

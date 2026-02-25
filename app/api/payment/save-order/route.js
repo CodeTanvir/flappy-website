@@ -3,7 +3,7 @@ import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunctions";
 import { sendMail } from "@/lib/sendMail";
 import { zSchema } from "@/lib/zodSchema";
-import Order from "@/models/Order.model";
+import OrderModel from "@/models/Order.model";
 import ProductVariantModel from "@/models/ProductVariant.model";
 import z from "zod";
 
@@ -90,9 +90,9 @@ export async function POST(request) {
     // This prevents clients from tampering with prices or quantities
     const verifiedProducts = await Promise.all(
       products.map(async (item) => {
+     
         const variant = await ProductVariantModel.findById(item.variantId)
-          .populate("product")
-          .lean();
+          .populate("product");
 
         if (!variant) {
           throw new Error(`Variant ${item.variantId} not found or invalid`);
@@ -142,7 +142,7 @@ export async function POST(request) {
 
     while (!created) {
       try {
-        order = await Order.create({
+        order = await OrderModel.create({
           userId,
           name,
           email,
@@ -185,9 +185,9 @@ export async function POST(request) {
       console.log("Email sending failed:", error);
     }
 
-    return response(true, 201, "Order created successfully");
+    return response(true, 201, "Order created successfully",{orderId:order.orderId});
   } catch (error) {
-    console.log(error);
+
     return catchError(error);
   }
 }

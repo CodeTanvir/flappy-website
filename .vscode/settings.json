@@ -1,0 +1,37 @@
+{
+  "files.exclude": {
+    "node_modules": true,
+    ".next": true,
+    "dist": true,
+    ".git": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.next/**": true,
+    "**/dist/**": true,
+    "**/.git/objects/**": true,
+    "**/.git/info/**": true,
+    "**/coverage/**": true,
+    "**/.cache/**": true
+  },
+  "search.exclude": {
+    "node_modules": true,
+    ".next": true,
+    "dist": true,
+    ".git": true
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "[javascript]": {
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    }
+  },
+  "[javascriptreact]": {
+    "editor.formatOnSave": false
+  },
+  "[json]": {
+    "editor.formatOnSave": true
+  }
+}

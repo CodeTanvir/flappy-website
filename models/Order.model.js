@@ -38,11 +38,12 @@ const orderSchema = new mongoose.Schema(
   type: [
     {
       productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
-      variantId: { type: String, required: true },
+      variantId: { type: mongoose.Schema.Types.ObjectId, ref: "ProductVariant", required: true },
       name: { type: String, required: true },
       qty: { type: Number, required: true },
       mrp: { type: Number, required: true },
       sellingPrice: { type: Number, required: true },
+      _id: false
     }
   ],
   required: true,
@@ -108,6 +109,6 @@ orderSchema.pre("save", async function (next) {
   next();
 });
 
-const Order = mongoose.models.Order || mongoose.model("Order", orderSchema);
+const OrderModel = mongoose.models.Order || mongoose.model("Order", orderSchema);
 
-export default Order;
+export default OrderModel;
