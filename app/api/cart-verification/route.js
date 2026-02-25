@@ -1,6 +1,9 @@
 import { catchError, response } from "@/lib/helperFunctions";
+import MediaModel from "@/models/Media.model";
+import ProductModel from "@/models/Product.model";
 import ProductVariantModel from "@/models/ProductVariant.model";
-
+ProductModel;
+MediaModel;
 export async function POST(request){
     try{
         const payload = await request.json();
