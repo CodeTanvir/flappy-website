@@ -10,7 +10,7 @@ async function FeaturedProduct() {
   const productData = await res.json();
 
   return (
-    <section className="lg:px-32 px-4 sm:py-10">
+    <section className="lg:px-32 px-10 sm:py-10">
       <div className="flex justify-between items-center mb-5">
         <h2 className="sm:text-4xl text-2xl font-semibold">
           Featured Products

@@ -1,10 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import ImagePlaceholder from "@/public/assets/images/img-placeholder.webp";
 import { WEBSITE_PRODUCT_DETAILS } from "@/routes/WebsiteRoute";
-import { ShoppingBag } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -30,7 +28,7 @@ function ProductBox({ product }) {
         {/* Image Section */}
         <div className="relative bg-gray-100 p-4 sm:p-6 rounded-2xl">
           {discount > 0 && (
-            <p
+            <span
               className="
               absolute
               top-2 left-2
@@ -45,7 +43,7 @@ function ProductBox({ product }) {
             "
             >
               -{discount}% off
-            </p>
+            </span>
           )}
 
           <Image
@@ -73,7 +71,7 @@ function ProductBox({ product }) {
           </p>
 
           {/* Product Name */}
-          <h3 className="font-semibold text-sm sm:text-base  min-h-[30px]">
+          <h3 className="font-semibold text-sm sm:text-base  min-h-[20px]">
             {product?.name}
           </h3>
 
@@ -108,7 +106,7 @@ function ProductBox({ product }) {
             </div>
 
             {/* Add to Cart Button */}
-            <Button
+            {/* <Button
               size="icon"
               className="
                 h-8 w-8 sm:h-10 sm:w-10
@@ -121,7 +119,7 @@ function ProductBox({ product }) {
               "
             >
               <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button>
+            </Button> */}
           </div>
         </CardContent>
       </Link>

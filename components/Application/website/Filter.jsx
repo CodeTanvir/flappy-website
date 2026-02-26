@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ButtonLoading } from "../ButtonLoading";
+
 function Filter() {
   const searchParams = useSearchParams();
   const [priceFilter, setPriceFilter] = useState({ minPrice: 0, maxPrice: 0 });
@@ -104,10 +105,13 @@ function Filter() {
         <AccordionItem value="1">
           <AccordionTrigger
             className="uppercase font-semibold
-           hover:no-underline"
+           hover:no-underline "
+           
           >
             Category
+            
           </AccordionTrigger>
+          {/* <div className="border border-teal-950"></div> */}
           <AccordionContent>
             <div className="max-h-48 overflow-auto">
               <ul>
