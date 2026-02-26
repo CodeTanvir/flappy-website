@@ -54,7 +54,7 @@ function Shop() {
     <div>
       <WebsiteBreadcrumb props={breadcrumb} />
       <section className=" my-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 lg:flex">
+        <div className="max-w-7xl mx-auto px-4 sm:px-1 lg:px-8 lg:flex">
         {windowSize.width > 1024 ? (
           <div className="w-72 me-4">
             <div className="sticky top-0 bg-gray-70 p-4 rounded">
