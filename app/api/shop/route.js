@@ -38,7 +38,7 @@ export async function GET(request){
             if(categorySlug){
                 const slugs = categorySlug.split(',')
                 const categoryData = await CategoryModel.find({deletedAt:null, slug:{$in:slugs}}).select('_id').lean()
-                console.log(categoryData)
+               
                 categoryId = categoryData.map(category => category._id)
             }
 
@@ -100,6 +100,53 @@ export async function GET(request){
                 }
             },
             {
+                $lookup:{
+                    from:"categories",
+                    localField:"category",
+                    foreignField:"_id",
+                    as:"category"
+                }
+            },
+              {
+        $unwind: {
+          path: "$category",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup:{
+            from:"reviews",
+            localField:"_id",
+            foreignField:"product",
+            as:"reviews"
+        }
+      },
+      {
+  $addFields: {
+    reviews: {
+      $map: {
+        input: "$reviews",
+        as: "review",
+        in: {
+          rating: { $toInt: "$$review.rating" }
+        }
+      }
+    }
+  }
+},
+{
+  $addFields: {
+    reviewCount: { $size: "$reviews" },
+    averageRating: {
+      $cond: [
+        { $gt: [{ $size: "$reviews" }, 0] },
+        { $avg: "$reviews.rating" },
+        0
+      ]
+    }
+  }
+},
+            {
                  $project:{
                 _id:1,
                 name:1,
@@ -107,6 +154,8 @@ export async function GET(request){
                 mrp:1,
                 sellingPrice:1,
                 discountPercentage:1,
+                averageRating: { $round: ["$averageRating", 1] },
+reviewCount: 1,
                 media:{
                     _id:1,
                     secure_url:1,
@@ -118,7 +167,12 @@ export async function GET(request){
                     mrp:1,
                     sellingPrice:1,
                     discountPercentage:1
-                }
+                },
+               category: {
+           
+            name: "$category.name",
+            
+          },
 
             }
             }

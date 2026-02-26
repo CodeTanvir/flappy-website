@@ -3,14 +3,15 @@ import Header from "@/components/Application/website/Header";
 import { Poppins } from "next/font/google";
 import Script from "next/script";
 
-const poppin = Poppins({
-  weight: ["400", "500", "600", "700", "800"],
-  display: "swap",
+const poppins = Poppins({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-poppins",
 });
+
 function layout({ children }) {
   return (
-    <div className={poppin.className}>
+    <div className={poppins.variable}>
       <Header />
       <main>{children}</main>
        <Script
