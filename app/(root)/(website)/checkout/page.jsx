@@ -608,8 +608,11 @@ function Checkout() {
           </div>
         </div>
       )}
+     
     </div>
   );
 }
+
+
 
 export default Checkout;
