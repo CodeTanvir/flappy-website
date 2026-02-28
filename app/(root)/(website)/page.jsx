@@ -46,8 +46,8 @@ function page() {
       </section>
       <FeaturedProduct />
 
-      <section className="sm:pt-10 pt-2 pb-2 lg:px-32">
-        <div className="relative w-full aspect-[16/6]">
+      <section className="sm:pt-10 pt-6 pb-6 lg:px-32">
+        <div className="relative w-full aspect-[16/3]">
           <Image
             src={advertisingBanner}
             alt="Advertisement"

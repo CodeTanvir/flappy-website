@@ -58,7 +58,7 @@ function Testimonial() {
     speed: 500,
     autoplay: true,
     arrows: false,
-    slidesToShow: 1, // mobile first
+    slidesToShow: 3, // mobile first
     slidesToScroll: 1,
     responsive: [
       {
