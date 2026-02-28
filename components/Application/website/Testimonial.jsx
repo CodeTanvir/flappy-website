@@ -1,4 +1,5 @@
 "use client";
+
 import { BsChatQuote } from "react-icons/bs";
 import { IoStar } from "react-icons/io5";
 import Slider from "react-slick";
@@ -48,90 +49,86 @@ This one stands out in terms of reliability.
 It feels worth the money spent.`,
     rating: 4,
   },
-  {
-    name: "Aisha Khan",
-    review: `The user experience is very intuitive.
-Even as a beginner, I had no confusion using it.
-Everything feels simple yet powerful.`,
-    rating: 5,
-  },
-  {
-    name: "Rahul Verma",
-    review: `At first, I faced a small issue during setup.
-The support team resolved it quickly.
-Since then, everything has been working perfectly.`,
-    rating: 4.5,
-  },
-  {
-    name: "Emily Carter",
-    review: `The build quality exceeded my expectations.
-It looks even better in real life.
-I am very happy with my purchase.`,
-    rating: 5,
-  },
-  {
-    name: "Omar Faruk",
-    review: `This product helped me save a lot of time.
-The performance is smooth and reliable.
-I would confidently buy from here again.`,
-    rating: 4.5,
-  },
 ];
 
 function Testimonial() {
- const settings = {
-  dots: true,
-  infinite: true,
-  speed: 500,
-  autoplay: true,
-  arrows: false,
-  slidesToShow: 3,
-  slidesToScroll: 1,
-  responsive: [
-    {
-      breakpoint: 1024,
-      settings: {
-        slidesToShow: 2,
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    autoplay: true,
+    arrows: false,
+    slidesToShow: 1, // mobile first
+    slidesToScroll: 1,
+    responsive: [
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 1,
+        },
       },
-    },
-    {
-      breakpoint: 768,
-      settings: {
-        slidesToShow: 1,
-        dots:false
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+        },
       },
-    },
-  ],
-};
+      {
+        breakpoint: 1400,
+        settings: {
+          slidesToShow: 3,
+        },
+      },
+    ],
+  };
+
   return (
-    <div className="lg:px-32 px-4 sm:pt-20 pt-5 pb-10">
-      <h2 className="text-center sm:text-4xl text-2xl mb-5 font-semibold"></h2>
-      <Slider {...settings}>
-        {testimonials.map((Item, index) => (
-          <div key={index} className="px-3 sm:px-5 py-6">
-            <div className="border rounded-lg p-5 h-full flex flex-col justify-between">
-              <BsChatQuote size={30} className="mb-3" />
-              <p className="mb-5 text-sm sm:text-base leading-relaxed break-words">{Item.review}</p>
-              <h4 className="font-semibold">{Item.name}</h4>
-              <div className="flex mt-5">
-              {[...Array(5)].map((_, i) => (
-  <IoStar
-    key={i}
-    size={20}
-    className={
-      i < Math.floor(Item.rating)
-        ? "text-yellow-400"
-        : "text-gray-300"
-    }
-  />
-))}
+    <section className="bg-gray-50 py-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
+        <h2 className="text-center text-2xl sm:text-4xl font-semibold mb-10">
+          What Our Customers Say
+        </h2>
+
+        <Slider {...settings}>
+          {testimonials.map((item, index) => (
+            <div key={index} className="px-3">
+              <div className="bg-white border rounded-xl p-6 h-full flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-300">
+                <div>
+                  <BsChatQuote size={28} className="mb-4 text-gray-400" />
+
+                  <p className="text-sm sm:text-base leading-relaxed text-gray-600 mb-6">
+                    {item.review}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-gray-800">
+                    {item.name}
+                  </h4>
+
+                  <div className="flex mt-3">
+                    {[...Array(5)].map((_, i) => (
+                      <IoStar
+                        key={i}
+                        size={18}
+                        className={
+                          i < Math.floor(item.rating)
+                            ? "text-yellow-400"
+                            : "text-gray-300"
+                        }
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </Slider>
-    </div>
+          ))}
+        </Slider>
+      </div>
+    </section>
   );
 }
 
 export default Testimonial;
+
+  
