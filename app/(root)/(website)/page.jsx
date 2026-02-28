@@ -52,7 +52,7 @@ function page() {
             src={advertisingBanner}
             alt="Advertisement"
             fill
-            className="object-cover"
+            className="object-fill"
             priority
           />
         </div>
