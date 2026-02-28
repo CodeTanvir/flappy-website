@@ -3,6 +3,9 @@ import Header from "@/components/Application/website/Header";
 import { Poppins } from "next/font/google";
 import Script from "next/script";
 
+export const metadata = {
+  viewport: "width=device-width, initial-scale=1",
+};
 const poppins = Poppins({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
