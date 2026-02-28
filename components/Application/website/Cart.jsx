@@ -50,7 +50,7 @@ function Cart() {
           <SheetTitle className="text-2xl">My Cart</SheetTitle>
           <SheetDescription></SheetDescription>
         </SheetHeader>
-        <div className="h-[calc(100vh-40px)] pb-10">
+        <div className="h-[calc(100vh-6vh)] pb-10">
           <div className="h-[calc(100%-135px)] overflow-auto px-2">
             {cart.count === 0 && (
               <div className="h-full flex justify-center items-center text-xl font-semibold">
