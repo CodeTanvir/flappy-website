@@ -42,21 +42,24 @@ function page() {
             </Link>
           </div>
         </div>
+        
       </section>
       <FeaturedProduct />
 
-      <section className="sm:pt-20 pt-5 pb-10">
-        <div className="relative w-full h-[200px] sm:h-[300px] lg:h-[400px]">
+      <section className="sm:pt-10 pt-2 pb-2 lg:px-32">
+        <div className="relative w-full h-[100px] sm:h-[700px] lg:h-[300px]">
           <Image
             src={advertisingBanner}
             alt="Advertisement"
             fill
-            className="object-cover"
+            className="object-fill"
             priority
           />
         </div>
       </section>
+      
       <Testimonial />
+      
       <section className="lg:px-32 px-4 border-t py-10">
         <div className="grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-10">
           <div className="text-center">

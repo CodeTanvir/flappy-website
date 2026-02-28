@@ -162,15 +162,27 @@
   color: #ffffff;
 }
 
-@layer base {
+/* @layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
   }
-}
+} */
 
 .slick-dots {
   bottom: 15px !important;
+}
+/* Fix react-slick height & layout issues */
+.slick-track {
+  display: flex !important;
+}
+
+.slick-slide {
+  height: inherit !important;
+}
+
+.slick-slide > div {
+  height: 100%;
 }

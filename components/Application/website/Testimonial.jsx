@@ -79,49 +79,52 @@ I would confidently buy from here again.`,
 ];
 
 function Testimonial() {
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    autoplay: true,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-          dots: true,
-          infinite: true,
-        },
+ const settings = {
+  dots: true,
+  infinite: true,
+  speed: 500,
+  autoplay: true,
+  arrows: false,
+  slidesToShow: 3,
+  slidesToScroll: 1,
+  responsive: [
+    {
+      breakpoint: 1024,
+      settings: {
+        slidesToShow: 2,
       },
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-          dots: true,
-          infinite: true,
-        },
+    },
+    {
+      breakpoint: 768,
+      settings: {
+        slidesToShow: 1,
+        dots:false
       },
-    ],
-  };
+    },
+  ],
+};
   return (
     <div className="lg:px-32 px-4 sm:pt-20 pt-5 pb-10">
       <h2 className="text-center sm:text-4xl text-2xl mb-5 font-semibold"></h2>
       <Slider {...settings}>
         {testimonials.map((Item, index) => (
-          <div key={index} className="p-8">
-            <div className="border rounded-lg p-5">
+          <div key={index} className="px-3 sm:px-5 py-6">
+            <div className="border rounded-lg p-5 h-full flex flex-col justify-between">
               <BsChatQuote size={30} className="mb-3" />
-              <p className="mb-5">{Item.review}</p>
+              <p className="mb-5 text-sm sm:text-base leading-relaxed break-words">{Item.review}</p>
               <h4 className="font-semibold">{Item.name}</h4>
               <div className="flex mt-5">
-                {Array.from({ length: Item.rating }).map((_, i) => (
-                  <IoStar key={`star`} className="text-yellow-400" size={20} />
-                ))}
+              {[...Array(5)].map((_, i) => (
+  <IoStar
+    key={i}
+    size={20}
+    className={
+      i < Math.floor(Item.rating)
+        ? "text-yellow-400"
+        : "text-gray-300"
+    }
+  />
+))}
               </div>
             </div>
           </div>
