@@ -3,10 +3,9 @@ import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
+  SheetTrigger
 } from "@/components/ui/sheet";
 import { showToast } from "@/lib/showToast";
 import imgPlaceholder from "@/public/assets/images/img-placeholder.webp";
@@ -45,116 +44,116 @@ function Cart() {
           {cart.count}
         </span>
       </SheetTrigger>
-      <SheetContent className="sm:max-w-[450px] w-full">
-        <SheetHeader className="py-2">
-          <SheetTitle className="text-2xl">My Cart</SheetTitle>
-          <SheetDescription></SheetDescription>
-        </SheetHeader>
-        <div className="h-[calc(100vh-6vh)] pb-10">
-          <div className="h-[calc(100%-135px)] overflow-auto px-2">
-            {cart.count === 0 && (
-              <div className="h-full flex justify-center items-center text-xl font-semibold">
-                your Cart is Empty{" "}
-              </div>
-            )}
-            {cart.products?.map((product) => (
-              <div
-                key={product.variantId}
-                className="flex justify-between items-center gap-5 mb-4 border-b pb-4"
-              >
-                <div className="flex gap-5 items-center">
-                  <Image
-                    src={product?.media || imgPlaceholder.src}
-                    height={100}
-                    width={100}
-                    alt={product.name}
-                    className="w-20 h-20 rounded border"
-                  />
-                  <div>
-                    <h4 className="text-lg mb-1">{product.name}</h4>
-                    <p className="text-gray-500">
-                      {product.size}/{product.color}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <button
-                    onClick={() =>
-                      dispatch(
-                        removeFromCart({
-                          productId: product.productId,
-                          variantId: product.variantId,
-                        }),
-                      )
-                    }
-                    type="button"
-                    className="text-red-500 underline underline-offset-1 mb-2 cursor-pointer"
-                  >
-                    Remove
-                  </button>
-                  <p className="font-semibold">
-                    {product.qty} X{" "}
-                    {product.sellingPrice.toLocaleString("en-IN", {
-                      style: "currency",
-                      currency: "BDT",
-                    })}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+     <SheetContent className="sm:max-w-[450px] w-full flex flex-col p-0">
 
-          <div className="h-28 border-t pt-5 px-2">
-            <h2 className="flex justify-between items-center text-lg font-semibold">
-              <span>Subtotal</span>
-              <span>
-                {subtotal.toLocaleString("en-BD", {
-                  style: "currency",
-                  currency: "BDT",
-                })}
-              </span>
-            </h2>
-            <h2 className="flex justify-between items-center text-lg font-semibold">
-              <span>Discount</span>
-              <span>
-                {discount.toLocaleString("en-BD", {
-                  style: "currency",
-                  currency: "BDT",
-                })}
-              </span>
-            </h2>
+  <SheetHeader className="p-4 border-b">
+    <SheetTitle className="text-2xl">My Cart</SheetTitle>
+  </SheetHeader>
 
-            <div className="flex justify-between gap-5 mt-3">
-              <Button
-                type="button"
-                asChild
-                variant="secondary"
-                className="w-[200px]"
-                onClick={() => setOpen(false)}
-              >
-                <Link href={WEBSITE_CART}>View Cart</Link>
-              </Button>
-              <Button
-                type="button"
-                asChild
-                className="w-[200px]"
-                onClick={() => setOpen(false)}
-              >
-                {cart.count ? (
-                  <Link href={WEBSITE_CHECKOUT}>Check out</Link>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => showToast("error", "Your cart is Empty")}
-                  >
-                    Checkout
-                  </button>
-                )}
-              </Button>
-            </div>
+  {/* Scrollable Products */}
+  <div className="flex-1 overflow-y-auto px-4 py-3">
+    {cart.count === 0 && (
+      <div className="h-full flex justify-center items-center text-xl font-semibold">
+        Your Cart is Empty
+      </div>
+    )}
+
+    {cart.products?.map((product) => (
+      <div
+        key={product.variantId}
+        className="flex justify-between items-center gap-4 mb-4 border-b pb-4"
+      >
+        <div className="flex gap-4 items-center">
+          <Image
+            src={product?.media || imgPlaceholder.src}
+            height={80}
+            width={80}
+            alt={product.name}
+            className="w-20 h-20 rounded border object-cover"
+          />
+          <div>
+            <h4 className="text-base font-medium">{product.name}</h4>
+            <p className="text-gray-500 text-sm">
+              {product.size}/{product.color}
+            </p>
           </div>
         </div>
-      </SheetContent>
+
+        <div className="text-right">
+          <button
+            onClick={() =>
+              dispatch(
+                removeFromCart({
+                  productId: product.productId,
+                  variantId: product.variantId,
+                }),
+              )
+            }
+            type="button"
+            className="text-red-500 text-sm underline mb-1"
+          >
+            Remove
+          </button>
+
+          <p className="font-semibold text-sm">
+            {product.qty} ×{" "}
+            {product.sellingPrice.toLocaleString("en-BD", {
+              style: "currency",
+              currency: "BDT",
+            })}
+          </p>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  {/* Fixed Bottom Section */}
+  <div className="border-t p-4 space-y-3 bg-white">
+    <div className="flex justify-between font-semibold">
+      <span>Subtotal</span>
+      <span>
+        {subtotal.toLocaleString("en-BD", {
+          style: "currency",
+          currency: "BDT",
+        })}
+      </span>
+    </div>
+
+    <div className="flex justify-between font-semibold">
+      <span>Discount</span>
+      <span>
+        {discount.toLocaleString("en-BD", {
+          style: "currency",
+          currency: "BDT",
+        })}
+      </span>
+    </div>
+
+    <div className="flex gap-3 pt-2">
+      <Button asChild variant="secondary" className="flex-1">
+        <Link href={WEBSITE_CART} onClick={() => setOpen(false)}>
+          View Cart
+        </Link>
+      </Button>
+
+      <Button asChild className="flex-1">
+        {cart.count ? (
+          <Link href={WEBSITE_CHECKOUT} onClick={() => setOpen(false)}>
+            Checkout
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={() => showToast("error", "Your cart is Empty")}
+          >
+            Checkout
+          </button>
+        )}
+      </Button>
+    </div>
+  </div>
+
+</SheetContent>
     </Sheet>
   );
 }
