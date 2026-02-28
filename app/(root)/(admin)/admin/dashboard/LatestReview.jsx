@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import userImage from "@/public/assets/images/admin.png";
+import userImage from "@/public/assets/images/user.png";
 import { IoStar } from "react-icons/io5";
 
 function LatestReview() {

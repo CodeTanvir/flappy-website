@@ -1,4 +1,4 @@
-import userIcon from "@/public/assets/images/admin.png";
+import userIcon from "@/public/assets/images/user.png";
 import Image from "next/image";
 import { IoStar } from "react-icons/io5";
 function ReviewList({ review }) {

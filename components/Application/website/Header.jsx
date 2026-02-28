@@ -1,7 +1,7 @@
 "use client";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import userIcon from "@/public/assets/images/admin.png";
 import logo from "@/public/assets/images/black.png";
+import userIcon from "@/public/assets/images/user.png";
 import {
   USER_DASHBOARD,
   WEBSITE_HOME,
@@ -33,6 +33,8 @@ function Header() {
             alt="logo"
             // className="lg:w-32 w-24"
           />
+          
+
         </Link>
         <div className="flex justify-between gap-20">
           <nav
@@ -55,6 +57,7 @@ function Header() {
                 alt="logo"
                 className="lg:w-32 w-24"
               />
+              
               <button type="button" onClick={() => setIsMobileMenu(false)}>
                 <IoMdClose
                   size={25}
@@ -123,6 +126,7 @@ function Header() {
             ) : (
               <Link href={USER_DASHBOARD}>
                 <Avatar>
+                  
                   <AvatarImage src={auth?.avatar?.url || userIcon.src} />
                 </Avatar>
               </Link>
