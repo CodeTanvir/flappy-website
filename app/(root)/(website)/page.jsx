@@ -47,12 +47,12 @@ function page() {
       <FeaturedProduct />
 
       <section className="sm:pt-10 pt-2 pb-2 lg:px-32">
-        <div className="relative w-full h-[100px] sm:h-[700px] lg:h-[300px]">
+        <div className="relative w-full aspect-[16/6]">
           <Image
             src={advertisingBanner}
             alt="Advertisement"
             fill
-            className="object-fill"
+            className="object-cover"
             priority
           />
         </div>
