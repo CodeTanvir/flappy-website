@@ -3,178 +3,136 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =========================
+   Utilities
+========================= */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
 }
 
+/* =========================
+   LUXURY RED + CHARCOAL
+   Light Theme
+========================= */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
+    /* Base */
+    --background: 20 20% 97%; /* Soft warm white */
+    --foreground: 220 10% 15%; /* Charcoal */
+
     --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
+    --card-foreground: 220 10% 15%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 173 58% 39%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 173 58% 39%;
-    --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
+    --popover-foreground: 220 10% 15%;
 
-  .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 173 58% 45%;
+    /* Deep Wine Red */
+    --primary: 350 65% 32%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 173 58% 45%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+
+    --secondary: 20 15% 92%;
+    --secondary-foreground: 220 10% 20%;
+
+    --muted: 20 10% 94%;
+    --muted-foreground: 220 5% 45%;
+
+    --accent: 350 65% 32%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 20 10% 88%;
+    --input: 20 10% 90%;
+    --ring: 350 65% 32%;
+
+    --radius: 0.75rem;
+
+    /* Charts */
+    --chart-1: 350 65% 32%;
+    --chart-2: 220 5% 40%;
+    --chart-3: 220 5% 60%;
+    --chart-4: 350 40% 50%;
+    --chart-5: 220 5% 75%;
+
+    /* Sidebar */
+    --sidebar-background: 20 20% 96%;
+    --sidebar-foreground: 220 10% 20%;
+    --sidebar-primary: 350 65% 32%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 20 15% 92%;
+    --sidebar-accent-foreground: 220 10% 20%;
+    --sidebar-border: 20 10% 88%;
+    --sidebar-ring: 350 65% 32%;
   }
-}
-.toast-overlay {
-  position: fixed;
-  top: 0;
-  right: 0;
-  z-index: 999999 !important; /* ABOVE Cloudinary modal */
-  pointer-events: none;
-}
 
-.Toastify__toast {
-  pointer-events: auto; /* allow click */
-}
+  /* =========================
+     Dark Theme
+     True Black + Wine Red
+  ========================= */
+  .dark {
+    --background: 220 15% 8%;
+    --foreground: 0 0% 95%;
 
-@layer base {
+    --card: 220 15% 12%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 220 15% 12%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 350 65% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 10% 15%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 220 10% 15%;
+    --muted-foreground: 0 0% 70%;
+
+    --accent: 350 65% 40%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 50% 35%;
+    --destructive-foreground: 0 0% 95%;
+
+    --border: 220 10% 18%;
+    --input: 220 10% 18%;
+    --ring: 350 65% 40%;
+
+    --chart-1: 350 65% 40%;
+    --chart-2: 0 0% 70%;
+    --chart-3: 0 0% 50%;
+    --chart-4: 350 40% 55%;
+    --chart-5: 0 0% 35%;
+
+    --sidebar-background: 220 15% 10%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 350 65% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 10% 15%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 220 10% 18%;
+    --sidebar-ring: 350 65% 40%;
+  }
+
   * {
     @apply border-border;
   }
+
   body {
     @apply font-assistant bg-background text-foreground;
   }
 }
 
 /* =========================
-   CKEditor – Clean Dark
-   ========================= */
-
-.dark .ck.ck-editor {
-  /* Base */
-  --ck-color-base-background: #121212;
-  --ck-color-base-foreground: #e6e6e6;
-
-  /* Text */
-  --ck-color-text: #e6e6e6;
-  --ck-color-text-muted: #a1a1a1;
-
-  /* Toolbar */
-  --ck-color-toolbar-background: #1a1a1a;
-  --ck-color-toolbar-border: #2a2a2a;
-  --ck-color-toolbar-text: #e6e6e6;
-
-  /* Buttons */
-  --ck-color-button-default-background: transparent;
-  --ck-color-button-default-text: #e6e6e6;
-  --ck-color-button-default-hover-background: #2a2a2a;
-  --ck-color-button-default-hover-text: #ffffff;
-
-  --ck-color-button-on-background: #3a3a3a;
-  --ck-color-button-on-text: #ffffff;
-
-  /* Panels / Dropdown */
-  --ck-color-panel-background: #1a1a1a;
-  --ck-color-panel-border: #2a2a2a;
-
-  /* Inputs */
-  --ck-color-input-background: #121212;
-  --ck-color-input-text: #e6e6e6;
-  --ck-color-input-border: #2a2a2a;
-}
-
-/* Editor content */
-.dark .ck-content {
-  background: #121212;
-  color: #e6e6e6;
-}
-
-/* Dropdown / popup text FIX */
-.dark .ck.ck-dropdown__panel,
-.dark .ck.ck-balloon-panel {
-  background: #1a1a1a;
-  color: #e6e6e6;
-}
-
-/* Dropdown items */
-.dark .ck.ck-list__item .ck-button {
-  color: #e6e6e6;
-}
-
-.dark .ck.ck-list__item .ck-button:hover {
-  background: #2a2a2a;
-  color: #ffffff;
-}
-
-/* @layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-} */
-
+   Slick Fix
+========================= */
 .slick-dots {
   bottom: 15px !important;
 }
-/* Fix react-slick height & layout issues */
+
 .slick-track {
   display: flex !important;
 }

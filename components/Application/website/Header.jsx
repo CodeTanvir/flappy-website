@@ -8,9 +8,10 @@ import {
   WEBSITE_LOGIN,
   WEBSITE_SHOP,
 } from "@/routes/WebsiteRoute";
+import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HiMiniBars3 } from "react-icons/hi2";
 import { IoIosSearch, IoMdClose } from "react-icons/io";
 import { VscAccount } from "react-icons/vsc";
@@ -18,10 +19,47 @@ import { useSelector } from "react-redux";
 import Cart from "./Cart";
 import Search from "./Search";
 
+// category dropdown no longer uses Radix; replaced with CSS hover menu
+import { FaChevronDown } from "react-icons/fa";
+
 function Header() {
   const auth = useSelector((store) => store.authStore.auth);
   const [isMobileMenu, setIsMobileMenu] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+
+  const [categories, setCategories] = useState([]);
+  const [catOpen, setCatOpen] = useState(false);
+  const closeTimer = useRef(null);
+
+  const handleMouseEnter = () => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+    setCatOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    closeTimer.current = setTimeout(() => {
+      setCatOpen(false);
+      closeTimer.current = null;
+    }, 200); // delay to allow pointer to reach menu
+  };
+
+  // load categories for dropdown
+  useEffect(() => {
+    const getCategories = async () => {
+      try {
+        const { data } = await axios.get("/api/category/get-category");
+        if (data.success) {
+          setCategories(data.data || []);
+        }
+      } catch (err) {
+        console.error("Header: failed to fetch categories", err);
+      }
+    };
+    getCategories();
+  }, []);
 
   return (
     <header className="bg-white border-b sticky top-0 z-40">
@@ -42,11 +80,50 @@ function Header() {
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-8">
-            <Link href={WEBSITE_HOME} className="navLink">Home</Link>
-            <Link href={WEBSITE_HOME} className="navLink">About</Link>
-            <Link href={WEBSITE_SHOP} className="navLink">Shop</Link>
-            <Link href={WEBSITE_HOME} className="navLink">Hoodies</Link>
-            <Link href={WEBSITE_HOME} className="navLink">Oversized</Link>
+            <Link href={WEBSITE_HOME} className="navLink hover:text-primary hover:font-bold">
+              Home
+            </Link>
+            <Link href={WEBSITE_HOME} className="navLink hover:text-primary hover:font-bold">
+              About
+            </Link>
+            <Link href={WEBSITE_SHOP} className="navLink hover:text-primary hover:font-bold">
+              Shop
+            </Link>
+
+            {/* category dropdown (hover + click with delay) */}
+            <div
+              className="relative"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              <span
+                onClick={() => setCatOpen((prev) => !prev)}
+                className="navLink flex items-center gap-1 hover:text-primary hover:font-bold cursor-pointer"
+              >
+                Category <FaChevronDown />
+              </span>
+              <div
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                className={`absolute left-0 mt-2 w-40 bg-white border rounded shadow-lg transition-opacity ${
+                  catOpen ? "opacity-100 visible" : "opacity-0 invisible"
+                }`}
+              >
+                {categories.length > 0 ? (
+                  categories.map((cat) => (
+                    <Link
+                      key={cat._id}
+                      href={`${WEBSITE_SHOP}?category=${encodeURIComponent(cat.name)}`}
+                      className="block px-4 py-2 hover:bg-primary rounded-xl hover:text-white"
+                    >
+                      {cat.name}
+                    </Link>
+                  ))
+                ) : (
+                  <span className="block px-4 py-2 text-gray-500">Loading...</span>
+                )}
+              </div>
+            </div>
           </nav>
 
           {/* Right Side */}
@@ -97,8 +174,14 @@ function Header() {
           <Link href={WEBSITE_HOME}>Home</Link>
           <Link href={WEBSITE_HOME}>About</Link>
           <Link href={WEBSITE_SHOP}>Shop</Link>
-          <Link href={WEBSITE_HOME}>Hoodies</Link>
-          <Link href={WEBSITE_HOME}>Oversized</Link>
+          {categories.map((cat) => (
+            <Link
+              key={cat._id}
+              href={`${WEBSITE_SHOP}?category=${encodeURIComponent(cat.name)}`}
+            >
+              {cat.name}
+            </Link>
+          ))}
         </ul>
       </nav>
 

@@ -22,25 +22,34 @@ function ProductBox({ product }) {
 
   return (
     <Card
-      className="group rounded-2xl border p-2 pb-0 border-teal-200 hover:shadow-xl transition-all duration-600 overflow-hidden"
+      className="
+        group
+        rounded-2xl
+        border
+        border-border
+        bg-card
+        p-2 pb-0
+        hover:shadow-xl
+        transition-all
+        duration-500
+        overflow-hidden
+      "
     >
       <Link href={WEBSITE_PRODUCT_DETAILS(product.slug)}>
         {/* Image Section */}
-        <div className="relative bg-gray-100 p-4 sm:p-6 rounded-2xl">
+        <div className="relative bg-muted p-4 sm:p-6 rounded-2xl">
           {discount > 0 && (
             <span
               className="
-              absolute
-              top-2 left-2
-              bg-pink-500
-              text-white
-              text-sm
-              sm:text-sm
-              rounded-2xl
-              px-2 py-1
-              z-10
-         
-            "
+                absolute
+                top-2 left-2
+                bg-primary
+                text-primary-foreground
+                text-xs sm:text-sm
+                rounded-xl
+                px-2 py-1
+                z-10
+              "
             >
               -{discount}% off
             </span>
@@ -64,20 +73,20 @@ function ProductBox({ product }) {
         </div>
 
         {/* Content Section */}
-        <CardContent className="p-3 sm:p-5 space-y-1">
+        <CardContent className="p-3 sm:p-5 space-y-2">
           {/* Category */}
           <p className="text-xs sm:text-sm text-muted-foreground truncate">
             {product?.category?.name || "Clothing"}
           </p>
 
           {/* Product Name */}
-          <h3 className="font-semibold text-sm sm:text-base  min-h-[20px]">
+          <h3 className="font-semibold text-sm sm:text-base min-h-[20px] text-foreground">
             {product?.name}
           </h3>
 
           {/* Rating */}
           <div className="flex items-center gap-2 text-xs sm:text-sm">
-            <span className="text-yellow-500 text-xs sm:text-sm">
+            <span className="text-foreground">
               ★★★★★
             </span>
             <span className="text-muted-foreground">
@@ -88,7 +97,7 @@ function ProductBox({ product }) {
           {/* Price Section */}
           <div className="flex items-center justify-between pt-1">
             <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
-              <span className="text-teal-600 font-bold text-sm sm:text-lg">
+              <span className="text-primary font-semibold text-sm sm:text-lg">
                 {product?.sellingPrice?.toLocaleString("en-BD", {
                   style: "currency",
                   currency: "BDT",
@@ -96,7 +105,7 @@ function ProductBox({ product }) {
               </span>
 
               {product?.mrp && (
-                <span className="line-through text-gray-400 text-xs sm:text-sm">
+                <span className="line-through text-muted-foreground text-xs sm:text-sm">
                   {product?.mrp?.toLocaleString("en-BD", {
                     style: "currency",
                     currency: "BDT",
@@ -104,22 +113,6 @@ function ProductBox({ product }) {
                 </span>
               )}
             </div>
-
-            {/* Add to Cart Button */}
-            {/* <Button
-              size="icon"
-              className="
-                h-8 w-8 sm:h-10 sm:w-10
-                rounded-full
-                bg-teal-100
-                text-teal-700
-                hover:bg-teal-600
-                hover:text-white
-                transition
-              "
-            >
-              <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Button> */}
           </div>
         </CardContent>
       </Link>

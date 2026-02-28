@@ -64,19 +64,19 @@ function Testimonial() {
       {
         breakpoint: 768,
         settings: {
-          slidesToShow: 3,
+          slidesToShow: 1,
         },
       },
       {
         breakpoint: 1024,
         settings: {
-          slidesToShow: 3,
+          slidesToShow: 1,
         },
       },
       {
         breakpoint: 1400,
         settings: {
-          slidesToShow: 3,
+          slidesToShow: 1,
         },
       },
     ],
@@ -86,7 +86,7 @@ function Testimonial() {
     <section className="bg-gray-50 py-14">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
         <h2 className="text-center text-2xl sm:text-4xl font-semibold mb-10">
-          What Our Customers Say
+          What Our <span className="text-primary font-bold">Customers </span>Say
         </h2>
 
         <Slider {...settings}>
