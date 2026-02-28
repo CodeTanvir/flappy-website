@@ -58,19 +58,19 @@ function Testimonial() {
     speed: 500,
     autoplay: true,
     arrows: false,
-    slidesToShow: 3, // mobile first
+    slidesToShow: 1, // mobile first
     slidesToScroll: 1,
     responsive: [
       {
         breakpoint: 768,
         settings: {
-          slidesToShow: 1,
+          slidesToShow: 3,
         },
       },
       {
         breakpoint: 1024,
         settings: {
-          slidesToShow: 2,
+          slidesToShow: 3,
         },
       },
       {
