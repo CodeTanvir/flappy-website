@@ -29,19 +29,19 @@ function UserPanelNavigation() {
         <div className="border shadow-sm p-4 rounded">
             <ul>
                 <li className="mb-2">
-                    <Link href="" className={`block p-3 text-sm rounded hover:bg-primary hover:text-white
+                    <Link href="/my-account" className={`block p-3 text-sm rounded hover:bg-primary hover:text-white
                         ${pathname.startsWith(USER_DASHBOARD) ? 'bg-primary text-white' : '' }`}>
                             Dashboard
                     </Link>
                 </li>
                  <li className="mb-2">
-                    <Link href="" className={`block p-3 text-sm rounded hover:bg-primary hover:text-white
+                    <Link href="/profile" className={`block p-3 text-sm rounded hover:bg-primary hover:text-white
                         ${pathname.startsWith(USER_PROFILE) ? 'bg-primary text-white' : '' }`}>
                             Profile
                     </Link>
                 </li>
                 <li className="mb-2">
-                    <Link href="" className={`block p-3 text-sm rounded hover:bg-primary hover:text-white
+                    <Link href="/orders" className={`block p-3 text-sm rounded hover:bg-primary hover:text-white
                         ${pathname.startsWith(USER_ORDERS) ? 'bg-primary text-white' : '' }`}>
                             Orders
                     </Link>

@@ -2,6 +2,8 @@
 import UserPanelLayout from "@/components/Application/website/UserPanelLayout";
 import WebsiteBreadcrumb from "@/components/Application/website/WebsiteBreadcrumb";
 import useFetch from "@/hooks/useFetch";
+import { WEBSITE_ORDER_DETAILS } from "@/routes/WebsiteRoute";
+import Link from "next/link";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { IoCartOutline } from "react-icons/io5";
 import { useSelector } from "react-redux";
@@ -63,7 +65,25 @@ function MyAccount() {
                                     </tr>
                                 </thead>
                                 <tbody>
-
+                                    {
+                                        dashboardData && dashboardData?.data?.recentOrders?.map((order,i)=>(
+                                            <tr key={order.Id}>
+                                                <td className="text-start text-sm text-gray-500 p-2 font-bold">
+                                                    {i+1}
+                                                </td>
+                                                 
+                                                 <td className="text-start text-sm text-gray-500 p-2 font-bold">
+                                                  <Link className="underline hover:text-blue-400" href={WEBSITE_ORDER_DETAILS(order.orderId)}>{order.orderId}</Link>
+                                                </td>
+                                                <td className="text-start text-sm text-gray-500 p-2 font-bold">
+                                                    {order.products.length}
+                                                </td>
+                                                 <td className="text-start text-sm text-gray-500 p-2 font-bold">
+                                                    {order.totalAmount.toLocaleString('en-BD',{style:'currency',currency:'BDT'})}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    }
                                 </tbody>
                             </table>
                         </div>
