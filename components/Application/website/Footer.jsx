@@ -26,9 +26,9 @@ function Footer() {
             <Image src={logo} width={60} height={60} alt="logo" />
 
             <ul className="space-y-3 text-sm">
-              <li><Link href="#">About</Link></li>
-              <li><Link href="#">Terms & Conditions</Link></li>
-              <li><Link href="#">Privacy Policy</Link></li>
+              <li><Link href="/about-us">About</Link></li>
+              <li><Link href="/terms-and-conditions">Terms & Conditions</Link></li>
+              <li><Link href="privacy-policy">Privacy Policy</Link></li>
               <li><Link href="#">Cancellation & Return Policy</Link></li>
               <li><Link href="#">FAQs</Link></li>
               <li><Link href="#">Contact Us</Link></li>
@@ -64,7 +64,7 @@ function Footer() {
                 <span>FOR ANY HELP YOU MAY CALL US AT</span>
               </div>
 
-              <p className="text-sm">+8809677666888</p>
+              <p className="text-sm">+8801909099</p>
               <p className="text-sm">Customer Service</p>
               <p className="text-sm">
                 Track your order or get help returning an order

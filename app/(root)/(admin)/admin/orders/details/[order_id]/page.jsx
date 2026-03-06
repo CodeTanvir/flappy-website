@@ -1,34 +1,57 @@
-import WebsiteBreadcrumb from "@/components/Application/website/WebsiteBreadcrumb";
+'use client'
+import BreadCrumb from "@/components/Application/Admin/BreadCrumb";
+import { Select } from "@/components/ui/select";
+import useFetch from "@/hooks/useFetch";
 import placeholderImg from "@/public/assets/images/img-placeholder.webp";
+import { ADMIN_DASHBOARD, ADMIN_ORDER_SHOW } from "@/routes/AdminPanelRoute";
 import { WEBSITE_PRODUCT_DETAILS } from "@/routes/WebsiteRoute";
-import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-async function OrderDetails({ params }) {
-  const { orderid } = await params;
-  const { data: orderData } = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/orders/get/${orderid}`,
-  );
+import { useEffect, useState } from "react";
+
+
+const breadcrumbData = [
+  {href: ADMIN_DASHBOARD, label:'Home'},
+  {href:ADMIN_ORDER_SHOW,label:'orders'},
+  {href:'',label:'Order Details'}
+];
+const statusOptions = [
+  {label:'Pending', value:'pending'},
+  {label:'Processing', value:'processing'},
+  {label:'Shipped', value:'shipped'},
+  {label:'Delivered', value:'delivered'},
+  {label:'Cancelled', value:'cancelled'},
+  {label:'Unverified', value:'unverified'}
+]
+ function OrderDetails({ params }) {
+  console.log(params)
+  const [orderData, setOrderData] = useState();
+  const [orderStatus, setOrderStatus] = useState();
+  const { order_id } = params;
   
-  const breadCrumb = {
-    title: "Order Details",
-    links: [{ label: "Order Details" }],
-  };
+  const {data, loading} = useFetch(`/api/orders/get/${order_id}`)
+  
+ useEffect(()=>{
+  if(data && data.success){
+    setOrderData(data.data)
+    setOrderStatus(data?.data?.status)
+  }
+ },[data])
   return (
     <div>
+      <BreadCrumb breadcrumbData={breadcrumbData}/>
       <div className="lg:px-32 px-5 my-20">
-      <WebsiteBreadcrumb props={breadCrumb} />
-      {orderData && !orderData.success ? <div className="flex justify-center items-center py-32">
+      {!orderData ? <div className="flex justify-center items-center py-32">
         <h4 className="text-red-500 text-xl font-semibold">Order Not Found</h4>
       </div> :
       <div>
         <div className="mt-3 mb-5">
-          <p><b>Order Id : </b>{orderData?.data?.orderId}</p>
-           <p><b>Payment Method : </b>{orderData?.data?.paymentMethod}</p>
-           <p className="capitalize"><b>Status: </b>{orderData?.data?.status}</p>
+          <p><b>Order Id : </b>{orderData?.orderId}</p>
+           <p><b>Payment Method : </b>{orderData?.paymentMethod}</p>
+           <p className="capitalize"><b>Status: </b>{orderData?.status}</p>
         </div>
         <table className="w-full border">
-          <thead className="border-b bg-gray-50 md:table-header-group hidden">
+          <thead className="border-b bg-gray-50 dark:bg-card md:table-header-group hidden">
             <tr>
               <th className="text-center p-3">Product</th>
 
@@ -38,7 +61,7 @@ async function OrderDetails({ params }) {
             </tr>
           </thead>
           <tbody>
-            {orderData && orderData?.data?.products.map((product)=>(
+            {orderData && orderData?.products.map((product)=>(
              
               <tr key={product.variantId._id} className="md:table-row block border-b">
                 <td className="p-3">
@@ -89,37 +112,37 @@ async function OrderDetails({ params }) {
               <tbody>
                 <tr>
                   <td className="font-medium py-2">Name</td>
-                  <td className="text-end py-2">{orderData?.data?.name}</td>
+                  <td className="text-end py-2">{orderData?.name}</td>
                 </tr>
                 <tr>
                   <td className="font-medium py-2">Email</td>
-                  <td className="text-end py-2">{orderData?.data?.email}</td>
+                  <td className="text-end py-2">{orderData?.email}</td>
                 </tr>
                  <tr>
                   <td className="font-medium py-2">Phone</td>
-                  <td className="text-end py-2">{orderData?.data?.phone}</td>
+                  <td className="text-end py-2">{orderData?.phone}</td>
                 </tr>
                  <tr>
                   <td className="font-medium py-2">District</td>
-                  <td className="text-end py-2">{orderData?.data?.district}</td>
+                  <td className="text-end py-2">{orderData?.district}</td>
                 </tr>
                  <tr>
                   <td className="font-medium py-2">Street</td>
-                  <td className="text-end py-2">{orderData?.data?.street}</td>
+                  <td className="text-end py-2">{orderData?.street}</td>
                 </tr>
                  <tr>
                   <td className="font-medium py-2">zip code</td>
-                  <td className="text-end py-2">{orderData?.data?.zipcode ?? 'not given'}</td>
+                  <td className="text-end py-2">{orderData?.zipcode ?? 'not given'}</td>
                 </tr>
                  <tr>
                   <td className="font-medium py-2">Order Note</td>
-                  <td className="text-end py-2">{orderData?.data?.ordernote || 'not given'}</td>
+                  <td className="text-end py-2">{orderData?.ordernote || 'not given'}</td>
                 </tr>
               </tbody>
             </table>
           </div>
           </div>
-          <div className="p-5 bg-gray-50">
+          <div className="p-5 bg-gray-50 dark:bg-card">
           <h4 className="text-lg font-semibold mb-5">Order Summary</h4>
 
           <div>
@@ -127,31 +150,40 @@ async function OrderDetails({ params }) {
               <tbody>
                 <tr>
                   <td className="font-medium py-2">Subtotal</td>
-                  <td className="text-end py-2">{orderData?.data?.subtotal.toLocaleString('en-BD',{
+                  <td className="text-end py-2">{orderData?.subtotal.toLocaleString('en-BD',{
                     style:'currency',currency:'BDT'
                   })}</td>
                 </tr>
                
               <tr>
                   <td className="font-medium py-2">Discount</td>
-                  <td className="text-end py-2">{orderData?.data?.discount.toLocaleString('en-BD',{
+                  <td className="text-end py-2">{orderData?.discount.toLocaleString('en-BD',{
                     style:'currency',currency:'BDT'
                   })}</td>
                 </tr>
                 <tr>
                   <td className="font-medium py-2">Coupon Discount</td>
-                  <td className="text-end py-2">{orderData?.data?.couponDiscountAmount.toLocaleString('en-BD',{
+                  <td className="text-end py-2">{orderData?.couponDiscountAmount.toLocaleString('en-BD',{
                     style:'currency',currency:'BDT'
                   })}</td>
                 </tr>
                 <tr>
                   <td className="font-medium py-2">Total</td>
-                  <td className="text-end py-2">{orderData?.data?.totalAmount.toLocaleString('en-BD',{
+                  <td className="text-end py-2">{orderData?.totalAmount.toLocaleString('en-BD',{
                     style:'currency',currency:'BDT'
                   })}</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+          <hr/>
+          <div className="pt-3">
+                  <h4>Order Status</h4>
+                  <Select options={statusOptions}
+                  selected={orderStatus}
+                  setSelected={(value)=> setOrderStatus(value)}
+                  placeholder="Select"
+                  isMulti={false}/>
           </div>
           </div>
         </div>
@@ -161,6 +193,6 @@ async function OrderDetails({ params }) {
         </div>
     </div>
   );
-}
+};
 
 export default OrderDetails;

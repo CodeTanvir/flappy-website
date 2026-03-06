@@ -181,6 +181,8 @@ function Checkout() {
       phone: true,
       district: true,
       street: true,
+      ordernote:true,
+      zipcode:true
     })
     .extend({
       paymentMethod: z.enum(["cod", "bkash"]),

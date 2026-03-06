@@ -31,8 +31,11 @@ export const ADMIN_CUSTOMERS_ADD = '/admin/customers/add';
 export const ADMIN_CUSTOMERS_EDIT = (id) => id ? `/admin/customers/edit/${id}` : ''; 
 
 //Review route
-export const ADMIN_REVIEW_SHOW = '/admin/review'
+export const ADMIN_REVIEW_SHOW = '/admin/review';
 
+//order Route
+export const ADMIN_ORDER_SHOW = '/admin/orders';
+export const ADMIN_ORDER_DETAILS = (orderId) => orderId ? `/admin/orders/details/${orderId}`: '';
 
 // Trash Route
 export const ADMIN_TRASH = '/admin/trash';

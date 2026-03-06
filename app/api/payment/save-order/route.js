@@ -29,8 +29,8 @@ export async function POST(request) {
         phone: true,
         district: true,
         street: true,
-        zipcode: false,
-        ordernote: false,
+        zipcode: true,
+        ordernote: true,
       })
       .extend({
         userId: z.string().optional(),

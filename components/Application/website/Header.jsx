@@ -65,7 +65,6 @@ function Header() {
     <header className="bg-white border-b sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
-          
           {/* Logo */}
           <Link href={WEBSITE_HOME} className="flex items-center">
             <Image
@@ -80,13 +79,22 @@ function Header() {
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-8">
-            <Link href={WEBSITE_HOME} className="navLink hover:text-primary hover:font-bold">
+            <Link
+              href={WEBSITE_HOME}
+              className="navLink hover:text-primary hover:font-bold"
+            >
               Home
             </Link>
-            <Link href={WEBSITE_HOME} className="navLink hover:text-primary hover:font-bold">
+            <Link
+              href="/about-us"
+              className="navLink hover:text-primary hover:font-bold"
+            >
               About
             </Link>
-            <Link href={WEBSITE_SHOP} className="navLink hover:text-primary hover:font-bold">
+            <Link
+              href={WEBSITE_SHOP}
+              className="navLink hover:text-primary hover:font-bold"
+            >
               Shop
             </Link>
 
@@ -113,14 +121,18 @@ function Header() {
                   categories.map((cat) => (
                     <Link
                       key={cat._id}
-                      href={`${WEBSITE_SHOP}?category=${encodeURIComponent(cat.name)}`}
+                      href={`${WEBSITE_SHOP}?category=${encodeURIComponent(
+                        cat.name.replace(/\s+/g, "-").toLowerCase().trim(),
+                      )}`}
                       className="block px-4 py-2 hover:bg-primary rounded-xl hover:text-white"
                     >
                       {cat.name}
                     </Link>
                   ))
                 ) : (
-                  <span className="block px-4 py-2 text-gray-500">Loading...</span>
+                  <span className="block px-4 py-2 text-gray-500">
+                    Loading...
+                  </span>
                 )}
               </div>
             </div>
@@ -147,10 +159,7 @@ function Header() {
             )}
 
             {/* Mobile Menu Button */}
-            <button
-              className="lg:hidden"
-              onClick={() => setIsMobileMenu(true)}
-            >
+            <button className="lg:hidden" onClick={() => setIsMobileMenu(true)}>
               <HiMiniBars3 className="iconStyle" size={24} />
             </button>
           </div>
