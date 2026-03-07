@@ -1,6 +1,14 @@
+// OrderOverview.tsx
 "use client";
 
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { useEffect, useState } from "react";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  XAxis,
+} from "recharts";
 
 import {
   ChartContainer,
@@ -8,48 +16,71 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-export const description = "A bar chart";
+import useFetch from "@/hooks/useFetch";
 
-const chartData = [
-  { month: "January", amount: 186 },
-  { month: "February", amount: 305 },
-  { month: "March", amount: 237 },
-  { month: "April", amount: 73 },
-  { month: "May", amount: 209 },
-  { month: "June", amount: 214 },
-  { month: "July", amount: 173 },
-  { month: "September", amount: 289 },
-  { month: "October", amount: 514 },
-  { month: "November", amount: 43 },
-  { month: "December", amount: 834 },
+const months = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
 ];
 
 const chartConfig = {
-  amount: {
-    label: "Amount",
-    color: "#8e51ff",
+  sales: {
+    label: "Sales",
+    color: "green",   // or use "hsl(var(--chart-1))" etc. if following shadcn theme
   },
 };
 
 export function OrderOverview() {
+  const [chartData, setChartData] = useState([]);
+  const { data: monthlySales } = useFetch("/api/dashboard/admin/monthly-sales");
+
+  useEffect(() => {
+    if (monthlySales?.success && Array.isArray(monthlySales.data)) {
+      const formatted = months.map((month, index) => {
+        const monthData = monthlySales.data.find(
+          (item) => item._id?.month === index + 1
+        );
+
+        return {
+          month,
+          sales: monthData ? monthData.totalSales : 0,
+        };
+      });
+
+      setChartData(formatted);
+    }
+  }, [monthlySales]);
+
   return (
-    <div>
-      <ChartContainer config={chartConfig}>
-        <BarChart accessibilityLayer data={chartData}>
-          <CartesianGrid vertical={false} />
-          <XAxis
-            dataKey="month"
-            tickLine={false}
-            tickMargin={10}
-            axisLine={false}
-            tickFormatter={(value) => value.slice(0, 3)}
-          />
-          <ChartTooltip
-            cursor={false}
-            content={<ChartTooltipContent  />}
-          />
-          <Bar dataKey="amount" fill="var(--color-amount)" radius={8} />
-        </BarChart>
+    <div className=" h-[360px] w-full px-1"> {/* ← give explicit height here */}
+      <ChartContainer config={chartConfig} className="h-full w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData}>
+            <CartesianGrid vertical={false} strokeDasharray="2 2" opacity={1} />
+
+            <XAxis
+              dataKey="month"
+              tickFormatter={(value) => value.slice(0, 3)}
+              tickLine={false}
+              axisLine={false}
+              tickMargin={4}
+            />
+
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent  />}
+            />
+
+            <Line
+              dataKey="sales"
+              type="monotone"
+              stroke="var(--color-sales)"
+              strokeWidth={4}
+              dot={{ r: 4, strokeWidth: 2 }}
+              activeDot={{ r: 6 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
       </ChartContainer>
     </div>
   );

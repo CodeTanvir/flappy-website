@@ -7,17 +7,11 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import useFetch from "@/hooks/useFetch";
+import { useEffect, useState } from "react";
 
 export const description = "A donut chart";
 
-const chartData = [
-  { status: "pending", count: 275, fill: "var(--color-pending)" },
-  { status: "processing", count: 200, fill: "var(--color-processing)" },
-  { status: "shipped", count: 187, fill: "var(--color-shipped)" },
-  { status: "delivered", count: 173, fill: "var(--color-delivered)" },
-  { status: "cancelled", count: 90, fill: "var(--color-cancelled)" },
-  { status: "unverified", count: 90, fill: "var(--color-unverified)" },
-];
 
 const chartConfig = {
   status: {
@@ -50,6 +44,29 @@ const chartConfig = {
 };
 
 export function OrderStatus() {
+  const [chartData, setChartData] = useState([])
+  const [statusCount, setStatusCount] = useState()
+  const [totalCount, setTotalCount] = useState(0)
+  const {data: orderStatus, loading} = useFetch('/api/dashboard/admin/order-status');
+  console.log(orderStatus)
+  useEffect(()=>{
+    if(orderStatus && orderStatus.success){
+      const newOrderStatus = orderStatus.data.map((o)=>({
+        status:o._id,
+        count:o.count,
+        fill:`var(--color-${o._id})`
+      }))
+      setChartData(newOrderStatus);
+      const getTotalCount = orderStatus.data.reduce((acc, curr)=> acc + curr.count, 0);
+      setTotalCount(getTotalCount);
+
+      const statusObj = orderStatus.data.reduce((acc,item)=>{
+        acc[item._id] = item.count;
+        return acc;
+      },{});
+      setStatusCount(statusObj)
+    }
+  },[orderStatus])
   return (
     <div>
       <ChartContainer
@@ -79,7 +96,7 @@ export function OrderStatus() {
                         y={viewBox.cy}
                         className="fill-foreground text-3xl font-bold"
                       >
-                        100
+                        {totalCount}
                       </tspan>
                       <tspan
                         x={viewBox.cx}
@@ -104,7 +121,7 @@ export function OrderStatus() {
               className="rounded-full 
                 px-2 text-sm bg-blue-500 text-white"
             >
-              0
+              {statusCount?.pending || 0}
             </span>
           </li>
           <li className="flex justify-between items-center mb-3 text-sm">
@@ -113,7 +130,7 @@ export function OrderStatus() {
               className="rounded-full 
                 px-2 text-sm bg-yellow-500 text-white"
             >
-              0
+              {statusCount?.processing || 0}
             </span>
           </li>
           <li className="flex justify-between items-center mb-3 text-sm">
@@ -122,7 +139,7 @@ export function OrderStatus() {
               className="rounded-full 
                 px-2 text-sm bg-cyan-500 text-white"
             >
-              0
+              {statusCount?.shipped || 0}
             </span>
           </li>
           <li className="flex justify-between items-center mb-3 text-sm">
@@ -131,7 +148,7 @@ export function OrderStatus() {
               className="rounded-full 
                 px-2 text-sm bg-green-500 text-white"
             >
-              0
+              {statusCount?.delivered || 0}
             </span>
           </li>
           <li className="flex justify-between items-center mb-3 text-sm">
@@ -140,7 +157,7 @@ export function OrderStatus() {
               className="rounded-full 
                 px-2 text-sm bg-red-500 text-white"
             >
-              0
+              {statusCount?.cencelled || 0}
             </span>
           </li>
           <li className="flex justify-between items-center mb-3 text-sm">
@@ -149,7 +166,7 @@ export function OrderStatus() {
               className="rounded-full 
                 px-2 text-sm bg-orange-500 text-white"
             >
-              0
+              {statusCount?.unverified || 0}
             </span>
           </li>
         </ul>

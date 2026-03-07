@@ -1,10 +1,13 @@
 'use client'
 import BreadCrumb from "@/components/Application/Admin/BreadCrumb";
-import { Select } from "@/components/ui/select";
+import { ButtonLoading } from "@/components/Application/ButtonLoading";
+import Select from "@/components/Application/Select";
 import useFetch from "@/hooks/useFetch";
+import { showToast } from "@/lib/showToast";
 import placeholderImg from "@/public/assets/images/img-placeholder.webp";
 import { ADMIN_DASHBOARD, ADMIN_ORDER_SHOW } from "@/routes/AdminPanelRoute";
 import { WEBSITE_PRODUCT_DETAILS } from "@/routes/WebsiteRoute";
+import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -24,9 +27,10 @@ const statusOptions = [
   {label:'Unverified', value:'unverified'}
 ]
  function OrderDetails({ params }) {
-  console.log(params)
+ 
   const [orderData, setOrderData] = useState();
   const [orderStatus, setOrderStatus] = useState();
+  const [updatingStatus, setUpdatingStatus] = useState(false)
   const { order_id } = params;
   
   const {data, loading} = useFetch(`/api/orders/get/${order_id}`)
@@ -37,15 +41,37 @@ const statusOptions = [
     setOrderStatus(data?.data?.status)
   }
  },[data])
+ const handleOrderStatus = async()=>{
+setUpdatingStatus(true)
+try{
+  const {data: response} = await axios.put('/api/orders/update-status',{
+    _id:orderData?._id,
+    status:orderStatus
+  })
+  if(!response.success){
+    throw new Error(response.message)
+  }
+  showToast('success', response.message)
+}catch(error){
+showToast('error', error.message)
+}finally{
+  setUpdatingStatus(false)
+}
+ }
   return (
     <div>
       <BreadCrumb breadcrumbData={breadcrumbData}/>
-      <div className="lg:px-32 px-5 my-20">
+      <div className=" px-5 border">
       {!orderData ? <div className="flex justify-center items-center py-32">
         <h4 className="text-red-500 text-xl font-semibold">Order Not Found</h4>
       </div> :
       <div>
-        <div className="mt-3 mb-5">
+        <div className="py-2 px-5 border-b mb-3">
+          <h4 className="text-lg font-bold text-primary">Order Details</h4>
+        </div>
+
+<div className="px-5 mb-5"> 
+   <div className="mt-3 mb-5">
           <p><b>Order Id : </b>{orderData?.orderId}</p>
            <p><b>Payment Method : </b>{orderData?.paymentMethod}</p>
            <p className="capitalize"><b>Status: </b>{orderData?.status}</p>
@@ -64,12 +90,12 @@ const statusOptions = [
             {orderData && orderData?.products.map((product)=>(
              
               <tr key={product.variantId._id} className="md:table-row block border-b">
-                <td className="p-3">
+                <td className=" md:table-cell p-3">
                   <div className="flex items-center gap-5">
                     <Image width={60} height={60} alt="product" className="rounded"
                      src={product?.variantId?.media?.[0]?.secure_url || placeholderImg.src}/>
                      <div>
-                      <h4 className="text-lg line-clamp-1">
+                      <h4 className="text-lg">
                         <Link href={WEBSITE_PRODUCT_DETAILS(product?.productId?.slug)}>
                         {product?.productId?.name}
                         </Link>
@@ -178,15 +204,19 @@ const statusOptions = [
           </div>
           <hr/>
           <div className="pt-3">
-                  <h4>Order Status</h4>
+                  <h4 className="text-lg font-semibold mb-2">Order Status</h4>
                   <Select options={statusOptions}
                   selected={orderStatus}
                   setSelected={(value)=> setOrderStatus(value)}
                   placeholder="Select"
                   isMulti={false}/>
+                  <ButtonLoading type="button" loading={updatingStatus} onClick={handleOrderStatus} 
+                  className="mt-5 cursor-pointer" text="Update Status"/>
           </div>
           </div>
-        </div>
+        </div></div>
+
+      
 
 
         </div>}

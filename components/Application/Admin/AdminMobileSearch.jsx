@@ -11,7 +11,7 @@ function AdminMobileSearch() {
         type="button"
         size="icon"
         onClick={() => setOpen(true)}
-        clasName="md:hidden"
+        className="md:hidden"
         variant="ghost"
       >
         <IoIosSearch />
