@@ -1,3 +1,4 @@
+import { orderNotification } from "@/email/orderNotification";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunctions";
 import { sendMail } from "@/lib/sendMail";
@@ -7,6 +8,7 @@ import ProductVariantModel from "@/models/ProductVariant.model";
 import z from "zod";
 
 export async function POST(request) {
+  console.log(request)
   try {
     await connectDB();
 
@@ -196,6 +198,7 @@ if(paymentMethod === 'bkash'){
       orderId: order.orderId,
     });
   } catch (error) {
+    console.log(error)
     return catchError(error);
   }
 }
