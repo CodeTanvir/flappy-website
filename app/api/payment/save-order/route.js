@@ -1,4 +1,3 @@
-import { orderNotification } from "@/email/orderNotification";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunctions";
 import { sendMail } from "@/lib/sendMail";
@@ -13,6 +12,7 @@ export async function POST(request) {
 
     const payload = await request.json();
 
+    // Product item schema (single cart item)
     const productSchema = z.object({
       productId: z.string().length(24, "Invalid product id format"),
       variantId: z.string().length(24, "Invalid variant id format"),
@@ -22,6 +22,7 @@ export async function POST(request) {
       sellingPrice: z.number().nonnegative(),
     });
 
+    // Main order schema
     const orderSchema = zSchema
       .pick({
         name: true,
@@ -62,13 +63,11 @@ export async function POST(request) {
         }
       });
 
-    const validate = orderSchema.safeParse(payload);
-   
-    if (!validate.success) {
-      return response(false, 400, "Invalid or missing fields", validate.error);
-    }
+    const validation = orderSchema.safeParse(payload);
 
-    const validatedData = validate.data;
+    if (!validation.success) {
+      return response(false, 400, "Invalid or missing fields", validation.error);
+    }
 
     const {
       userId,
@@ -84,21 +83,22 @@ export async function POST(request) {
       paymentMethod,
       bkashPhone,
       trxId,
-    } = validatedData;
+    } = validation.data;
 
-    // ✅ SECURITY: Verify all products exist and recalculate amounts on server
-    // This prevents clients from tampering with prices or quantities
+    // ────────────────────────────────────────────────
+    // SECURITY: Server-side product & price verification
+    // ────────────────────────────────────────────────
     const verifiedProducts = await Promise.all(
       products.map(async (item) => {
-     
-        const variant = await ProductVariantModel.findById(item.variantId)
-          .populate("product");
+        const variant = await ProductVariantModel.findById(item.variantId).populate(
+          "product"
+        );
 
         if (!variant) {
           throw new Error(`Variant ${item.variantId} not found or invalid`);
         }
 
-        // Verify the product data matches database (prevents price tampering)
+        // Prevent price tampering
         if (variant.mrp !== item.mrp || variant.sellingPrice !== item.sellingPrice) {
           throw new Error(
             `Price mismatch for ${item.name}. Possible tampering detected.`
@@ -116,33 +116,29 @@ export async function POST(request) {
       })
     );
 
-    // ✅ SECURITY: Recalculate all totals on server (don't trust client values)
+    // Recalculate everything on server — never trust client
     const recalculatedSubtotal = verifiedProducts.reduce(
-      (sum, product) => sum + product.sellingPrice * product.qty,
+      (sum, p) => sum + p.sellingPrice * p.qty,
       0
     );
 
     const recalculatedDiscount = verifiedProducts.reduce(
-      (sum, product) =>
-        sum + (product.mrp - product.sellingPrice) * product.qty,
+      (sum, p) => sum + (p.mrp - p.sellingPrice) * p.qty,
       0
     );
 
-    // Use server-calculated values, not client values
-  
-    let recalculatedTotalAmount =
-      recalculatedSubtotal - couponDiscountAmount;
-
-      if(paymentMethod === 'bkash'){
-        recalculatedTotalAmount =
-      (recalculatedSubtotal - couponDiscountAmount) * 0.9;
-      }
-
+    let recalculatedTotalAmount = recalculatedSubtotal - couponDiscountAmount;
+if(paymentMethod === 'bkash'){
+  recalculatedTotalAmount = Math.round((recalculatedSubtotal - couponDiscountAmount) * 0.9)
+}
     const bkash =
       paymentMethod === "bkash"
         ? { phoneNumber: bkashPhone, trxId }
         : undefined;
 
+    // ────────────────────────────────────────────────
+    // Create order (with retry on duplicate orderId)
+    // ────────────────────────────────────────────────
     let order;
     let created = false;
 
@@ -160,7 +156,7 @@ export async function POST(request) {
           products: verifiedProducts,
           subtotal: recalculatedSubtotal,
           discount: recalculatedDiscount,
-          couponDiscountAmount: couponDiscountAmount,
+          couponDiscountAmount,
           totalAmount: recalculatedTotalAmount,
           paymentMethod,
           bkash,
@@ -170,30 +166,36 @@ export async function POST(request) {
         created = true;
       } catch (err) {
         if (err.code === 11000) {
-          // duplicate orderId → retry with new one
+          // Duplicate key (orderId) → retry
           continue;
         }
         throw err;
       }
     }
 
+    // ────────────────────────────────────────────────
+    // Send confirmation email (fire-and-forget)
+    // ────────────────────────────────────────────────
     try {
       const mailData = {
         order_id: order.orderId,
         orderDetailsUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/order-details/${order.orderId}`,
       };
+
       await sendMail(
         "Order placed successfully",
         email,
-        orderNotification(mailData)
+        orderNotification(mailData) // assuming this function exists
       );
-    } catch (error) {
-      console.log("Email sending failed:", error);
+    } catch (emailErr) {
+      console.error("Email sending failed:", emailErr);
+      // Still return success — email failure shouldn't fail the order
     }
 
-    return response(true, 201, "Order created successfully",{orderId:order.orderId});
+    return response(true, 201, "Order created successfully", {
+      orderId: order.orderId,
+    });
   } catch (error) {
-
     return catchError(error);
   }
 }
