@@ -52,7 +52,6 @@ export async function POST(request) {
               message: "bKash phone number is required",
             });
           }
-
           if (!data.trxId) {
             ctx.addIssue({
               code: "custom",
@@ -64,7 +63,7 @@ export async function POST(request) {
       });
 
     const validate = orderSchema.safeParse(payload);
-
+   
     if (!validate.success) {
       return response(false, 400, "Invalid or missing fields", validate.error);
     }
@@ -87,24 +86,20 @@ export async function POST(request) {
       trxId,
     } = validatedData;
 
-    /* -------------------------------------------
-       SECURITY: VERIFY PRODUCTS FROM DATABASE
-    ------------------------------------------- */
-
+    // ✅ SECURITY: Verify all products exist and recalculate amounts on server
+    // This prevents clients from tampering with prices or quantities
     const verifiedProducts = await Promise.all(
       products.map(async (item) => {
+     
         const variant = await ProductVariantModel.findById(item.variantId)
           .populate("product");
 
         if (!variant) {
-          throw new Error(`Variant ${item.variantId} not found`);
+          throw new Error(`Variant ${item.variantId} not found or invalid`);
         }
 
-        // prevent price tampering
-        if (
-          variant.mrp !== item.mrp ||
-          variant.sellingPrice !== item.sellingPrice
-        ) {
+        // Verify the product data matches database (prevents price tampering)
+        if (variant.mrp !== item.mrp || variant.sellingPrice !== item.sellingPrice) {
           throw new Error(
             `Price mismatch for ${item.name}. Possible tampering detected.`
           );
@@ -121,10 +116,7 @@ export async function POST(request) {
       })
     );
 
-    /* -------------------------------------------
-       RECALCULATE TOTALS ON SERVER
-    ------------------------------------------- */
-
+    // ✅ SECURITY: Recalculate all totals on server (don't trust client values)
     const recalculatedSubtotal = verifiedProducts.reduce(
       (sum, product) => sum + product.sellingPrice * product.qty,
       0
@@ -136,28 +128,20 @@ export async function POST(request) {
       0
     );
 
+    // Use server-calculated values, not client values
+  
     let recalculatedTotalAmount =
       recalculatedSubtotal - couponDiscountAmount;
 
-    /* -------------------------------------------
-       APPLY BKASH 10% DISCOUNT
-    ------------------------------------------- */
-
-    if (paymentMethod === "bkash") {
-      recalculatedTotalAmount = Math.round(recalculatedTotalAmount * 0.9);
-    }
+      if(paymentMethod === 'bkash'){
+        recalculatedTotalAmount =
+      (recalculatedSubtotal - couponDiscountAmount) * 0.9;
+      }
 
     const bkash =
       paymentMethod === "bkash"
-        ? {
-            phoneNumber: bkashPhone,
-            trxId,
-          }
+        ? { phoneNumber: bkashPhone, trxId }
         : undefined;
-
-    /* -------------------------------------------
-       CREATE ORDER (HANDLE DUPLICATE ORDER ID)
-    ------------------------------------------- */
 
     let order;
     let created = false;
@@ -176,7 +160,7 @@ export async function POST(request) {
           products: verifiedProducts,
           subtotal: recalculatedSubtotal,
           discount: recalculatedDiscount,
-          couponDiscountAmount,
+          couponDiscountAmount: couponDiscountAmount,
           totalAmount: recalculatedTotalAmount,
           paymentMethod,
           bkash,
@@ -186,22 +170,18 @@ export async function POST(request) {
         created = true;
       } catch (err) {
         if (err.code === 11000) {
+          // duplicate orderId → retry with new one
           continue;
         }
         throw err;
       }
     }
 
-    /* -------------------------------------------
-       SEND ORDER EMAIL
-    ------------------------------------------- */
-
     try {
       const mailData = {
         order_id: order.orderId,
         orderDetailsUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/order-details/${order.orderId}`,
       };
-
       await sendMail(
         "Order placed successfully",
         email,
@@ -211,13 +191,9 @@ export async function POST(request) {
       console.log("Email sending failed:", error);
     }
 
-    return response(
-      true,
-      201,
-      "Order created successfully",
-      { orderId: order.orderId }
-    );
+    return response(true, 201, "Order created successfully",{orderId:order.orderId});
   } catch (error) {
+
     return catchError(error);
   }
 }
