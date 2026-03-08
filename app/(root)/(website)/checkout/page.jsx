@@ -450,6 +450,7 @@ function Checkout() {
                       setPaymentMethod={setPaymentMethod}
                       register={orderForm.register}
                       errors={orderForm.formState.errors}
+                      totalAmount={totalAmount}
                     />
                   </div>
 

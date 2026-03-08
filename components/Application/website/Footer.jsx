@@ -64,7 +64,7 @@ function Footer() {
                 <span>FOR ANY HELP YOU MAY CALL US AT</span>
               </div>
 
-              <p className="text-sm">+8801909099</p>
+              <p className="text-sm">+8801765763455</p>
               <p className="text-sm">Customer Service</p>
               <p className="text-sm">
                 Track your order or get help returning an order

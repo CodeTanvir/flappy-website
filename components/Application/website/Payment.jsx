@@ -3,7 +3,7 @@ import bkash from "@/public/assets/images/bkash_logo.svg";
 import qr from "@/public/assets/images/bkash_qr.jpeg";
 import Image from "next/image";
 import { FaMoneyBillWave } from "react-icons/fa";
-function Payment({ paymentMethod, setPaymentMethod, register, errors }) {
+function Payment({ paymentMethod, setPaymentMethod, register, errors, totalAmount }) {
   return (
     <div className=" mx-auto p-6 mt-6 border rounded-xl shadow-md bg-white ">
       <h2 className="text-2xl font-semibold mb-6">Select Payment Method</h2>
@@ -37,6 +37,7 @@ function Payment({ paymentMethod, setPaymentMethod, register, errors }) {
             className="text-2xl text-pink-600"
           />
           <span className="font-medium">Pay with bKash</span>
+          <span>10% OFF</span>
         </div>
       </div>
 
@@ -54,6 +55,9 @@ function Payment({ paymentMethod, setPaymentMethod, register, errors }) {
                 <p className="text-sm text-gray-500 mt-2">
                   Please send the exact amount to this number.
                 </p>
+                <p className="text-lg font-bold text-pink-400 ">10% OFF NOW PAY</p>
+                <h1 className="text-[4rem] font-bold text-pink-600 ">
+                  {Math.round(totalAmount - (0.1*totalAmount))}TK</h1>
               </div>
 
               {/* Right Side - QR + TrxID */}
@@ -84,6 +88,7 @@ function Payment({ paymentMethod, setPaymentMethod, register, errors }) {
                     {errors.bkashPhone.message}
                   </p>
                 )}
+                
                 <label className="block text-sm font-medium mb-1">
                   Transaction ID (TrxID)
                 </label>
