@@ -43,6 +43,7 @@ const orderSchema = new mongoose.Schema(
       qty: { type: Number, required: true },
       mrp: { type: Number, required: true },
       sellingPrice: { type: Number, required: true },
+      purchaseStatus:{type:String, required:true, default:'Incomplete'},
       _id: false
     }
   ],
@@ -61,7 +62,7 @@ const orderSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: orderStatus,
-      default: "unverified",
+      default: "pending",
     },
 
     deletedAt: {
@@ -76,14 +77,7 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
 
-    paymentStatus: {
-      type: String,
-      enum: ["pending", "paid", "failed"],
-      default: function () {
-        return this.paymentMethod === "cod" ? "pending" : "pending";
-      },
-    },
-
+  
     bkash: {
       phoneNumber: { type: String,  },
       trxId: { type: String, },

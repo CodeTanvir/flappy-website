@@ -43,6 +43,8 @@ export async function POST(request) {
         totalAmount: z.number(),
         products: z.array(productSchema),
         paymentMethod: z.enum(["cod", "bkash"]),
+        zipcode: z.string().optional(),
+        ordernote: z.string().optional(),
         bkashPhone: z.string().optional(),
         trxId: z.string().optional(),
       })
@@ -162,7 +164,7 @@ if(paymentMethod === 'bkash'){
           totalAmount: recalculatedTotalAmount,
           paymentMethod,
           bkash,
-          paymentStatus: "pending",
+         
         });
 
         created = true;

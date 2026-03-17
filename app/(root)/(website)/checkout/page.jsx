@@ -219,8 +219,7 @@ function Checkout() {
       phone: "",
       district: "",
       street: "",
-      zipcode: "",
-      ordernote: "",
+      
       userId: auth?.auth?._id,
     },
   });

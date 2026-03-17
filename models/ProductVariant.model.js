@@ -29,10 +29,15 @@ const productVariantSchema = new mongoose.Schema({
         type:Number,
         required:true,
     },
-    sku:{
-        type:String,
+    stock:{
+        type:Number,
         required:true,
-        unique:true
+        default:0
+    },
+    orders:{
+        type:Number,
+        required:false,
+        default:0,
     },
     media:[
         {
