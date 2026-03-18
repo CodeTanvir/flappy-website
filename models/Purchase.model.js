@@ -44,12 +44,16 @@ const purchaseSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
- totalCost: {
+ totalCostRMB: {           
       type: Number,
+      required: true,
       default: 0,
-      required:true
     },
-
+    totalCostBDT: {           
+      type: Number,
+      required: true,
+      default: 0,
+    },
      allocations: {
       type: [allocationSchema],
       required: true,

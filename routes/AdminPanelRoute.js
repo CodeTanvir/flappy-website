@@ -35,8 +35,13 @@ export const ADMIN_REVIEW_SHOW = '/admin/review';
 
 //order Route
 export const ADMIN_ORDER_SHOW = '/admin/orders';
-export const ADMIN_ORDER_BUY = '/admin/orders/buy';
+
 export const ADMIN_ORDER_DETAILS = (orderId) => orderId ? `/admin/orders/details/${orderId}`: '';
+
+//purchase Route
+export const ADMIN_ORDER_BUY = '/admin/purchase/buy-orders';
+export const ADMIN_PURCHASE_LIST = '/admin/purchase/all-purchase';
+
 
 // Trash Route
 export const ADMIN_TRASH = '/admin/trash';

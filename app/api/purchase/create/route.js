@@ -1,3 +1,4 @@
+import { getCNYtoBDTRate } from "@/app/services/apiExchangeRate";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunctions";
 import OrderModel from "@/models/Order.model";
@@ -10,10 +11,16 @@ export async function POST(request) {
     const { productVariantId, totalQty, totalCost, allocations } =
       await request.json();
 
+      
     // ✅ Validation
     if (!productVariantId || totalQty == null || !allocations?.length) {
       return response(false, 400, "Missing required fields");
     }
+
+const cnyToBdtRate = await getCNYtoBDTRate();
+console.log(cnyToBdtRate)
+const totalCostBDT = Number((totalCost * cnyToBdtRate).toFixed(2));
+
 
     // ✅ Convert orderId -> Mongo _id
     const fixedAllocations = [];
@@ -41,13 +48,15 @@ export async function POST(request) {
       purchase = await PurchaseModel.create({
         productVariantId,
         totalQty,
-        totalCost,
+        totalCostRMB:totalCost,
+        totalCostBDT,
         allocations: fixedAllocations,
       });
     } else {
       // ✅ UPDATE EXISTING
       purchase.totalQty += totalQty;
-      purchase.totalCost += totalCost;
+      purchase.totalCostRMB += totalCost;
+      purchase.totalCostBDT += totalCostBDT
 
       // 🔥 Merge allocations (NO duplicates)
       for (const newAlloc of fixedAllocations) {
