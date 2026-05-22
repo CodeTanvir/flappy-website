@@ -167,32 +167,136 @@ function Header() {
       </div>
 
       {/* Mobile Menu */}
-      <nav
-        className={`lg:hidden fixed top-0 left-0 w-full h-screen bg-white z-50 transition-all duration-300 ${
-          isMobileMenu ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        <div className="flex justify-between items-center p-4 border-b">
-          <Image src={logo} alt="logo" width={100} height={30} />
-          <button onClick={() => setIsMobileMenu(false)}>
-            <IoMdClose size={24} />
-          </button>
-        </div>
+     {/* Overlay */}
+<div
+  className={`fixed inset-0 bg-black/40 z-40 transition-opacity duration-300 lg:hidden ${
+    isMobileMenu
+      ? "opacity-100 visible"
+      : "opacity-0 invisible"
+  }`}
+  onClick={() => setIsMobileMenu(false)}
+/>
 
-        <ul className="flex flex-col gap-6 p-6 text-lg">
-          <Link href={WEBSITE_HOME}>Home</Link>
-          <Link href={WEBSITE_HOME}>About</Link>
-          <Link href={WEBSITE_SHOP}>Shop</Link>
-          {categories.map((cat) => (
+{/* Mobile Drawer */}
+<nav
+  className={`lg:hidden fixed top-0 right-0 h-screen w-[85%] max-w-sm bg-white shadow-2xl z-50 transition-transform duration-300 ${
+    isMobileMenu ? "translate-x-0" : "translate-x-full"
+  }`}
+>
+  {/* Header */}
+  <div className="flex items-center justify-between p-5 border-b">
+    <Image
+      src={logo}
+      alt="logo"
+      width={140}
+      height={40}
+      className="object-contain"
+    />
+
+    <button
+      onClick={() => setIsMobileMenu(false)}
+      className="p-2 rounded-full hover:bg-gray-100 transition"
+    >
+      <IoMdClose size={24} />
+    </button>
+  </div>
+
+  {/* User Section */}
+  <div className="flex items-center gap-3 p-5 border-b">
+    <Avatar className="w-12 h-12">
+      <AvatarImage src={auth?.avatar?.url || userIcon.src} />
+    </Avatar>
+
+    <div>
+      {auth ? (
+        <>
+          <p className="font-semibold text-gray-900">
+            {auth?.name || "User"}
+          </p>
+
+          <Link
+            href={USER_DASHBOARD}
+            onClick={() => setIsMobileMenu(false)}
+            className="text-sm text-primary"
+          >
+            Dashboard
+          </Link>
+        </>
+      ) : (
+        <>
+          <p className="font-semibold text-gray-900">
+            Welcome
+          </p>
+
+          <Link
+            href={WEBSITE_LOGIN}
+            onClick={() => setIsMobileMenu(false)}
+            className="text-sm text-primary"
+          >
+            Sign In
+          </Link>
+        </>
+      )}
+    </div>
+  </div>
+
+  {/* Navigation */}
+  <div className="p-5 overflow-y-auto h-[calc(100vh-160px)]">
+    <div className="space-y-2">
+      <Link
+        href={WEBSITE_HOME}
+        onClick={() => setIsMobileMenu(false)}
+        className="flex items-center px-4 py-3 rounded-xl hover:bg-gray-100 transition font-medium"
+      >
+        Home
+      </Link>
+
+      <Link
+        href="/about-us"
+        onClick={() => setIsMobileMenu(false)}
+        className="flex items-center px-4 py-3 rounded-xl hover:bg-gray-100 transition font-medium"
+      >
+        About
+      </Link>
+
+      <Link
+        href={WEBSITE_SHOP}
+        onClick={() => setIsMobileMenu(false)}
+        className="flex items-center px-4 py-3 rounded-xl hover:bg-gray-100 transition font-medium"
+      >
+        Shop
+      </Link>
+    </div>
+
+    {/* Categories */}
+    <div className="mt-8">
+      <h3 className="px-4 mb-3 text-xs font-semibold tracking-wider text-gray-500 uppercase">
+        Categories
+      </h3>
+
+      <div className="space-y-1">
+        {categories.length > 0 ? (
+          categories.map((cat) => (
             <Link
               key={cat._id}
-              href={`${WEBSITE_SHOP}?category=${encodeURIComponent(cat.name)}`}
+              href={`${WEBSITE_SHOP}?category=${encodeURIComponent(
+                cat.name.replace(/\s+/g, "-").toLowerCase().trim()
+              )}`}
+              onClick={() => setIsMobileMenu(false)}
+              className="block px-4 py-3 rounded-xl hover:bg-gray-100 transition"
             >
               {cat.name}
             </Link>
-          ))}
-        </ul>
-      </nav>
+          ))
+        ) : (
+          <p className="px-4 text-sm text-gray-500">
+            Loading categories...
+          </p>
+        )}
+      </div>
+    </div>
+  </div>
+</nav>
 
       <Search isShow={showSearch} />
     </header>

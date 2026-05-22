@@ -41,6 +41,8 @@
     "cloudinary": "^2.8.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "embla-carousel-autoplay": "^8.6.0",
+    "embla-carousel-react": "^8.6.0",
     "entities": "^7.0.0",
     "export-to-csv": "^1.4.0",
     "fuse.js": "^7.1.0",

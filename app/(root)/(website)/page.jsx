@@ -7,6 +7,7 @@ import { FaShippingFast } from "react-icons/fa";
 import { GiReturnArrow } from "react-icons/gi";
 import { TbRosetteDiscountFilled } from "react-icons/tb";
 
+import LatestProduct from "@/components/Application/website/LatestProduct";
 import banner1 from "@/public/assets/images/banner1.png";
 import banner2 from "@/public/assets/images/banner2.png";
 import Image from "next/image";
@@ -17,35 +18,45 @@ function page() {
       <section>
         <MainSlider />
       </section>
-      <section className="lg:px-32 px-4 sm:pt-20 pt-5 pb-10">
-        <div className="grid grid-cols-2 sm:gap-10 gap-2">
-          <div className="border rounded-lg overflow-hidden">
-            <Link className="transition-all hover:scale-110" href="">
-              <Image
-                src={banner1.src}
-                width={banner1.width}
-                height={banner1.height}
-                alt="banner 1"
-                className="transition-all hover:scale-110"
-              />
-            </Link>
-          </div>
-          <div className="border rounded-lg overflow-hidden">
-            <Link className="transition-all hover:scale-110" href="">
-              <Image
-                src={banner2.src}
-                width={banner2.width}
-                height={banner2.height}
-                alt="banner 2"
-                className="transition-all hover:scale-110"
-              />
-            </Link>
-          </div>
-        </div>
-        
-      </section>
-      <FeaturedProduct />
+      <section className="px-4 sm:px-6 md:px-32 lg:px-16 xl:px-24 2xl:px-32 pt-5 sm:pt-10 lg:pt-20 pb-10">
+  
 
+  <FeaturedProduct />
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 lg:gap-8 mt-12 mb-12">
+    
+    <div className="overflow-hidden rounded-lg border">
+      <Link href="" className="block">
+        <Image
+          src={banner1.src}
+          alt="Promotional Banner 1"
+          width={banner1.width}
+          height={banner1.height}
+          className="w-full h-auto transition-transform duration-300 hover:scale-105"
+          priority
+        />
+      </Link>
+    </div>
+
+    <div className="overflow-hidden rounded-lg border">
+      <Link href="" className="block">
+        <Image
+          src={banner2.src}
+          alt="Promotional Banner 2"
+          width={banner2.width}
+          height={banner2.height}
+          className="w-full h-auto transition-transform duration-300 hover:scale-105"
+          priority
+        />
+      </Link>
+    </div>
+
+  </div>
+  <LatestProduct />
+</section>
+      
+        
+     
+    
       <section className="sm:pt-10 pt-6 pb-6 lg:px-32">
         <div className="relative w-full aspect-[16/3]">
           <Image

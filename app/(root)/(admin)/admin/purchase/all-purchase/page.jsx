@@ -1,17 +1,18 @@
 "use client";
 
 import {
-    Box,
-    Button,
-    Chip,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Typography,
+  Box,
+  Button,
+  Checkbox,
+  Chip,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
 } from "@mui/material";
 
 import { useQuery } from "@tanstack/react-query";
@@ -28,7 +29,7 @@ export default function PurchaseList() {
       const json = await res.json();
 
       if (!json.success) throw new Error(json.message);
-
+      console.log(json)
       return json.data || [];
     },
   });
@@ -177,6 +178,80 @@ export default function PurchaseList() {
               );
             })}
           </TableBody>
+          {
+              <TableBody>
+                              {data.allocations.map((h, i) => {
+                                const allocated = allocation[h.orderId] || 0;
+            
+                                return (
+                                  <TableRow
+                                    key={i}
+                                    sx={{
+                                      background:
+                                        allocated > 0
+                                          ? "rgba(34,197,94,0.08)"
+                                          : "transparent",
+                                    }}
+                                  >
+                                    <TableCell>
+                                      <Checkbox checked={allocated > 0} />
+                                    </TableCell>
+                                    <TableCell>
+                                      <Link className="hover:text-blue-500 hover:underline"
+                                       href={ADMIN_ORDER_DETAILS(h.orderId)}>#{h.orderId}</Link>
+                                      
+                                      </TableCell>
+                                    <TableCell>{h.customer}</TableCell>
+                                    <TableCell>{h.qty}</TableCell>
+                                    <TableCell style={{ color: "#16a34a" }}>
+                                      {allocated}
+                                    </TableCell>
+                                    <TableCell
+                                      style={{
+                                        color:
+                                          h.remaining > 0
+                                            ? "#dc2626"
+                                            : "#16a34a",
+                                      }}
+                                    >
+                                      {h.remaining}
+                                    </TableCell>
+                                    <TableCell>
+              <Typography fontSize={11} color="#64748b">
+                {(() => {
+                  const created = new Date(h.date);
+                  const deadline = new Date(created);
+                  deadline.setDate(deadline.getDate() + 23);
+            
+                  const now = new Date();
+                  const diff = deadline - now;
+            
+                  if (diff <= 0) {
+                    return (
+                      <span style={{ color: "#dc2626", fontWeight: 600 }}>
+                        Expired
+                      </span>
+                    );
+                  }
+            
+                  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                  const hours = Math.floor(
+                    (diff / (1000 * 60 * 60)) % 24
+                  );
+            
+                  return (
+                    <span style={{ color: "#f59e0b", fontWeight: 600 }}>
+                      {days}d {hours}h left
+                    </span>
+                  );
+                })()}
+              </Typography>
+            </TableCell>
+                                  </TableRow>
+                                );
+                              })}
+                            </TableBody>
+          }
         </Table>
       </TableContainer>
     </Box>
