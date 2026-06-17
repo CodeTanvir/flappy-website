@@ -1,6 +1,8 @@
-import { getCNYtoBDTRate } from "@/app/services/apiExchangeRate";
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunctions";
+
+import { getCNYtoBDTRate } from "@/app/services/apiExchangeRate";
+import AllocationModel from "@/models/Allocation.model";
 import OrderModel from "@/models/Order.model";
 import PurchaseModel from "@/models/Purchase.model";
 
@@ -8,12 +10,7 @@ export async function PUT(request) {
   try {
     await connectDB();
 
-    const { purchaseId, totalQty, totalCost, allocations } =
-      await request.json();
-
-    if (!purchaseId || !totalQty || !allocations?.length) {
-      return response(false, 400, "Missing fields");
-    }
+    const { purchaseId, totalQty, totalCost } = await request.json();
 
     const purchase = await PurchaseModel.findById(purchaseId);
 
@@ -21,71 +18,69 @@ export async function PUT(request) {
       return response(false, 404, "Purchase not found");
     }
 
-    /* ================= REMOVE OLD EFFECT ================= */
-    for (const oldAlloc of purchase.allocations) {
-      const order = await OrderModel.findById(oldAlloc.orderId);
+    // ================= REMOVE OLD ALLOCATION EFFECT =================
 
-      if (!order) continue;
+    const oldAllocations = await AllocationModel.find({
+      purchaseId,
+    });
 
-      const product = order.products.find(
-        (p) =>
-          p.variantId.toString() ===
-          purchase.productVariantId.toString()
-      );
-
-      if (!product) continue;
-
-      product.boughtQty -= oldAlloc.allocate;
-
-      product.purchaseStatus =
-        product.boughtQty >= product.qty
-          ? "Completed"
-          : product.boughtQty > 0
-          ? "Partial"
-          : "Pending";
-
-      await order.save();
-    }
-
-    /* ================= NEW CALC ================= */
-    const rate = await getCNYtoBDTRate();
-    const totalCostBDT = Number((totalCost * rate).toFixed(2));
-
-    /* ================= APPLY NEW ================= */
-    purchase.totalQty = totalQty;
-    purchase.totalCostRMB = totalCost;
-    purchase.totalCostBDT = totalCostBDT;
-    purchase.allocations = allocations;
-
-    await purchase.save();
-
-    /* ================= APPLY NEW TO ORDERS ================= */
-    for (const alloc of allocations) {
+    for (const alloc of oldAllocations) {
       const order = await OrderModel.findById(alloc.orderId);
 
       if (!order) continue;
 
       const product = order.products.find(
-        (p) =>
-          p.variantId.toString() ===
-          purchase.productVariantId.toString()
+        (p) => p.variantId.toString() === purchase.productVariantId.toString(),
       );
 
-      if (!product) continue;
+      if (product) {
+        product.boughtQty = Math.max(0, (product.boughtQty || 0) - alloc.qty);
 
-      product.boughtQty =
-        (product.boughtQty || 0) + alloc.allocate;
+        product.purchaseStatus =
+          product.boughtQty >= product.qty
+            ? "Completed"
+            : product.boughtQty > 0
+              ? "Partial"
+              : "Pending";
 
-      product.purchaseStatus =
-        product.boughtQty >= product.qty
-          ? "Completed"
-          : "Partial";
-
-      await order.save();
+        await order.save();
+      }
     }
+
+    // delete old allocations
+
+    await AllocationModel.deleteMany({
+      purchaseId,
+    });
+
+    // ================= UPDATE PURCHASE =================
+
+    const rate = await getCNYtoBDTRate();
+
+    purchase.totalQty = Number(totalQty);
+
+    purchase.totalCostRMB = Number(totalCost);
+
+    purchase.totalCostBDT = Number((totalCost * rate).toFixed(2));
+
+    await purchase.save();
+
+    // ================= CREATE NEW FIFO ALLOCATION =================
+
+    const { allocatePurchase } = await import("@/lib/AllocatePurchase");
+
+    await allocatePurchase(
+      purchase._id,
+
+      purchase.productVariantId,
+
+      totalQty,
+    );
 
     return response(true, 200, "Purchase updated", purchase);
   } catch (error) {
+    console.log(error);
+
     return catchError(error);
   }
 }

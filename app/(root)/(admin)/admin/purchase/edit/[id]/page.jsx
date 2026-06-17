@@ -5,10 +5,10 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import {
-    Box,
-    Button,
-    TextField,
-    Typography,
+  Box,
+  Button,
+  TextField,
+  Typography,
 } from "@mui/material";
 
 export default function EditPurchase() {
@@ -17,11 +17,13 @@ export default function EditPurchase() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetch(`/api/purchase/${id}`)
+    fetch(`/api/purchase/get/${id}`)
       .then((res) => res.json())
       .then((res) => setData(res.data));
+    
   }, [id]);
 
+console.log(data)
   const handleSave = async () => {
     const res = await axios.put(
       "/api/purchase/update",

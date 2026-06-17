@@ -3,6 +3,7 @@ import BreadCrumb from "@/components/Application/Admin/BreadCrumb";
 import { ButtonLoading } from "@/components/Application/ButtonLoading";
 import Select from "@/components/Application/Select";
 import useFetch from "@/hooks/useFetch";
+import { formatBDDateTime } from "@/lib/dateFormatter";
 import { showToast } from "@/lib/showToast";
 import placeholderImg from "@/public/assets/images/img-placeholder.webp";
 import { ADMIN_DASHBOARD, ADMIN_ORDER_SHOW } from "@/routes/AdminPanelRoute";
@@ -75,6 +76,7 @@ showToast('error', error.message)
           <p><b>Order Id : </b>{orderData?.orderId}</p>
            <p><b>Payment Method : </b>{orderData?.paymentMethod}</p>
            <p className="capitalize"><b>Status: </b>{orderData?.status}</p>
+           <p className="capitalize"><b>Time: </b>{formatBDDateTime(orderData?.createdAt)}</p>
         </div>
         <table className="w-full border">
           <thead className="border-b bg-gray-50 dark:bg-card md:table-header-group hidden">
@@ -164,6 +166,57 @@ showToast('error', error.message)
                   <td className="font-medium py-2">Order Note</td>
                   <td className="text-end py-2">{orderData?.ordernote || 'not given'}</td>
                 </tr>
+              {orderData?.paymentMethod === 'bkash' && (
+  <tr>
+    <td colSpan="2" className="py-4">
+      <div className="rounded-xl border border-pink-200 bg-pink-50 p-4 dark:bg-pink-950/20 dark:border-pink-800">
+
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-full bg-pink-600 flex items-center justify-center text-white font-bold">
+            ৳
+          </div>
+
+          <div>
+            <h5 className="font-semibold text-pink-700 dark:text-pink-400">
+              bKash Payment
+            </h5>
+            <p className="text-sm text-gray-500">
+              Customer payment information
+            </p>
+          </div>
+        </div>
+
+
+        <div className="space-y-3">
+
+          <div className="flex justify-between bg-white dark:bg-card rounded-lg px-3 py-2">
+            <span className="font-medium">
+              bKash Number
+            </span>
+
+            <span className="text-gray-700 dark:text-gray-300">
+              {orderData?.bkash?.phoneNumber || 'Not given'}
+            </span>
+          </div>
+
+
+          <div className="flex justify-between bg-white dark:bg-card rounded-lg px-3 py-2">
+            <span className="font-medium">
+              Transaction ID
+            </span>
+
+            <span className="font-semibold text-pink-600">
+              {orderData?.bkash?.trxId || 'Not given'}
+            </span>
+          </div>
+
+        </div>
+
+      </div>
+    </td>
+  </tr>
+)}
+             
               </tbody>
             </table>
           </div>
