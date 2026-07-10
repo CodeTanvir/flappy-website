@@ -87,10 +87,10 @@ function Row({ row, history = [], onSave }) {
       return;
     }
 
-    if (Number(buyQty) > totalRemaining) {
-      showToast("error", "Buying more than required");
-      return;
-    }
+    // if (Number(buyQty) > totalRemaining) {
+    //   showToast("error", "Buying more than required");
+    //   return;
+    // }
 
     setLoading(true);
 
@@ -110,6 +110,7 @@ function Row({ row, history = [], onSave }) {
         totalQty: Number(buyQty),
         totalCost: Number(buyPrice),
         allocations,
+        totalRemaining
       };
 
       const res = await onSave(payload);
@@ -207,7 +208,7 @@ function Row({ row, history = [], onSave }) {
             value={buyQty}
             onChange={(e) => {
               const val = e.target.value;
-              if (Number(val) > totalRemaining) return;
+              // if (Number(val) > totalRemaining) return;
               setBuyQty(val);
             }}
             inputProps={{
