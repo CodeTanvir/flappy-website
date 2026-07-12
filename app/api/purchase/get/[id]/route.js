@@ -4,7 +4,9 @@ import MediaModel from "@/models/Media.model";
 import ProductModel from "@/models/Product.model";
 import ProductVariantModel from "@/models/ProductVariant.model";
 import PurchaseModel from "@/models/Purchase.model";
+import StockModel from "@/models/Stock.model";
 import mongoose from "mongoose";
+StockModel
 MediaModel;
 ProductVariantModel;
 ProductModel;
@@ -25,7 +27,7 @@ export async function GET(request,{params}){
 
         const {id} = params;
 
-        console.log("ID:",id);
+        
 
 
         if(!mongoose.isValidObjectId(id)){
@@ -35,12 +37,14 @@ export async function GET(request,{params}){
 
         const purchase = await PurchaseModel.findById(id)
         .populate(
-            "productVariantId"
+           "productVariantId"
+          
+        
         )
         .lean();
 
 
-        console.log("PURCHASE:",purchase);
+        
 
 
         if(!purchase){

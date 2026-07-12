@@ -39,6 +39,8 @@ export async function POST(request) {
       totalCostBDT,
     });
 
+    const purchaseId = purchase._id
+
     // Allocate Purchase
     await allocatePurchase(
       purchase._id,
@@ -52,7 +54,9 @@ export async function POST(request) {
 
       await StockModel.findOneAndUpdate(
         {
+          
           variantId: productVariantId,
+          
         },
         {
           $inc: {
@@ -60,7 +64,8 @@ export async function POST(request) {
           },
           $set: {
             buyingPrice: Number(totalCost) / Number(totalQty),
-            status: "cn"
+            status: "cn",
+            purchaseId,
           },
         },
         {

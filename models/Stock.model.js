@@ -1,10 +1,16 @@
 import mongoose from "mongoose";
 import ProductVariantModel from "./ProductVariant.model";
-ProductVariantModel
+import PurchaseModel from "./Purchase.model";
+ProductVariantModel,
+PurchaseModel
 const stockSchema = new mongoose.Schema(
 {
    
-
+    purchaseId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Purchase",
+        required:true
+    },
     variantId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"ProductVariant",

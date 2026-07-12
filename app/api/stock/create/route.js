@@ -15,7 +15,8 @@ export async function POST(request){
             productId: payload.productId,
             variantId: payload.variantId,
             stock:payload.stock,
-            buyingPrice:payload.buyingPrice
+            buyingPrice:payload.buyingPrice,
+            buyingId:payload.buying_id
         })
         await newStock.save()
         return response(true, 201, "Stock Updated")

@@ -1,51 +1,50 @@
 import mongoose from "mongoose";
 
-
 const allocationSchema = new mongoose.Schema(
-{
+    {
 
-productVariantId:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref:"ProductVariant",
-    required:true
-},
-
-
-purchaseId:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref:"Purchase",
-    required:true
-},
+        productVariantId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "ProductVariant",
+            required: true
+        },
 
 
-orderId:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref:"Order",
-    required:true
-},
+        purchaseId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Purchase",
+            required: true
+        },
 
 
-qty:{
-    type:Number,
-    required:true
-}
+        orderId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Order",
+            required: true
+        },
 
 
-},
-{
-    timestamps:true
-}
+        qty: {
+            type: Number,
+            required: true
+        }
+
+
+    },
+    {
+        timestamps: true
+    }
 
 );
 
 
 
 const AllocationModel =
-mongoose.models.Allocation ||
-mongoose.model(
-    "Allocation",
-    allocationSchema
-);
+    mongoose.models.Allocation ||
+    mongoose.model(
+        "Allocation",
+        allocationSchema
+    );
 
 
 

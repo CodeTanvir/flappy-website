@@ -6,6 +6,9 @@ import AllocationModel from "@/models/Allocation.model";
 import OrderModel from "@/models/Order.model";
 import PurchaseModel from "@/models/Purchase.model";
 
+import ProductModel from "@/models/Product.model";
+import { syncStock } from "@/lib/syncStock";
+ProductModel;
 export async function PUT(request) {
   try {
     await connectDB();
@@ -13,7 +16,7 @@ export async function PUT(request) {
     const { purchaseId, totalQty, totalCost } = await request.json();
 
     const purchase = await PurchaseModel.findById(purchaseId);
-
+    
     if (!purchase) {
       return response(false, 404, "Purchase not found");
     }
@@ -53,6 +56,9 @@ export async function PUT(request) {
       purchaseId,
     });
 
+
+
+
     // ================= UPDATE PURCHASE =================
 
     const rate = await getCNYtoBDTRate();
@@ -62,6 +68,18 @@ export async function PUT(request) {
     purchase.totalCostRMB = Number(totalCost);
 
     purchase.totalCostBDT = Number((totalCost * rate).toFixed(2));
+
+
+ 
+
+await syncStock({
+  type:"update",
+  variantId: purchase.productVariantId,
+  purchaseId: purchase._id,
+  totalQty,
+  totalCost,
+  rate
+});
 
     await purchase.save();
 
