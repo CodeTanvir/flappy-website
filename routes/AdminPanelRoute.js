@@ -45,3 +45,9 @@ export const ADMIN_PURCHASE_LIST = '/admin/purchase/all-purchase';
 
 // Trash Route
 export const ADMIN_TRASH = '/admin/trash';
+
+//Allocation
+export const ADMIN_ALLOCATION = '/admin/allocation'
+
+//Recieved Parcel
+export const ADMIN_RECIEVED_PARCEL = '/admin/recieve'

@@ -27,10 +27,17 @@ const allocationSchema = new mongoose.Schema(
         qty: {
             type: Number,
             required: true
-        }
+        },
+
+        location:{
+        type:String,
+        enum:["cn-online","cn-warehouse","bd-warehouse","in-shipment"],
+        default:"cn-online"
+    },
 
 
     },
+    
     {
         timestamps: true
     }

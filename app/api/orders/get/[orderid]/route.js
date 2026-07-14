@@ -1,5 +1,6 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunctions";
+import AllocationModel from "@/models/Allocation.model";
 import MediaModel from "@/models/Media.model";
 import OrderModel from "@/models/Order.model";
 import ProductModel from "@/models/Product.model";
@@ -27,7 +28,17 @@ export async function GET(request,{params}){
         if(!orderData){
             return response(false, 404, 'Order not found')
         }
-        return response(true, 200,'Order found',orderData)
+
+        const allocations = await AllocationModel.find({
+            orderId:orderData._id,
+            
+        }).select("location productVariantId").lean()
+
+
+        return response(true, 200,'Order found',{
+            ...orderData,
+            allocations
+        })
     }catch(error){
         return catchError(error)
     }
