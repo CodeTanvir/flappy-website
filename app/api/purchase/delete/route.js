@@ -91,8 +91,6 @@ for (const allocation of allocations) {
 
     } catch (error) {
 
-        console.log(error);
-
         return catchError(error);
 
     }

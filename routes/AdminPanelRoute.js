@@ -51,3 +51,6 @@ export const ADMIN_ALLOCATION = '/admin/allocation'
 
 //Recieved Parcel
 export const ADMIN_RECIEVED_PARCEL = '/admin/recieve'
+
+//Shipment
+export const ADMIN_ADD_SHIPMENT = '/admin/shipment/add'

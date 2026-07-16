@@ -12,12 +12,13 @@ const receivedParcelSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-
-    note: {
-      type: String,
-      default: "",
-    },
+    location:{
+    type:String,
+    enum:["cn-warehouse","bd-warehouse"],
+    default:"cn-warehouse"
+  }
   },
+  
   {
     timestamps: true,
   }

@@ -29,15 +29,19 @@ export async function POST(request) {
             return response(false, 404, "Variant not found");
         }
 
-        const receivedParcel = await ReceivedParcelModel.create({
-
-            variantId,
-
-            receivedQty,
-
-            note
-
-        });
+      const receivedParcel = await ReceivedParcelModel.findOneAndUpdate(
+  { variantId }, // find
+  {
+    $set: {
+      receivedQty,
+    },
+  
+  },
+  {
+    upsert: true,
+    new: true,
+  }
+);
 
         return response(
             true,

@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { showToast } from "@/lib/showToast";
+import { ButtonLoading } from "@/components/Application/ButtonLoading";
 
 export default function ReceiveParcelPage() {
 
@@ -22,7 +23,7 @@ export default function ReceiveParcelPage() {
     const [saving, setSaving] = useState(null);
 
     const [receiveQty, setReceiveQty] = useState({});
-
+const [deletingId, setDeletingId] = useState(null);
     // ==========================
     // GET PURCHASES
     // ==========================
@@ -110,6 +111,42 @@ export default function ReceiveParcelPage() {
     });
 
 };
+
+
+const { mutate: handleDelete } = useMutation({
+  mutationFn: async (id) => {
+    const { data } = await axios.delete("/api/received-parcel/delete", {
+      data: { id },
+    });
+
+    return data;
+  },
+
+  onMutate: (id) => {
+    setDeletingId(id);
+  },
+
+  onSuccess: (data) => {
+    showToast("success", data.message);
+
+    queryClient.invalidateQueries({
+      queryKey: ["received-parcel"],
+    });
+  },
+
+  onError: (error) => {
+    showToast(
+      "error",
+      error.response?.data?.message || error.message
+    );
+  },
+
+  onSettled: () => {
+    setDeletingId(null);
+  },
+});
+
+
     if (loading) {
 
         return (
@@ -119,6 +156,12 @@ export default function ReceiveParcelPage() {
         );
 
     }
+
+
+
+
+
+
 
 
     return (
@@ -184,7 +227,7 @@ export default function ReceiveParcelPage() {
                             purchases.map((item, index) => (
 
                                 <tr
-                                    key={item._id}
+                                    key={index}
                                     className="border-t"
                                 >
 
@@ -255,7 +298,7 @@ export default function ReceiveParcelPage() {
     type="number"
     min={1}
     max={item.remainingQty}
-    disabled={item.remainingQty === 0}
+    // disabled={item.remainingQty === 0}
     value={receiveQty[item.variantId] || ""}
     onChange={(e) =>
         setReceiveQty(prev => ({
@@ -271,10 +314,10 @@ export default function ReceiveParcelPage() {
 
                                         <Button
 
-                                        disabled={
-    item.remainingQty === 0 ||
-    saving === item.variantId
-}
+//                                         disabled={
+//     item.remainingQty === 0 ||
+//     saving === item.variantId
+// }
 
 onClick={() =>
     handleReceive(item.variantId)
@@ -283,15 +326,29 @@ onClick={() =>
                                         >
 
                                             {
-                                                item.remainingQty === 0
-                                                    ? "Completed"
-                                                    : saving === item._id
+                                                // item.remainingQty === 0
+                                                //     ? "Completed"
+                                                //     :
+                                                     saving === item._id
                                                         ? "Receiving..."
                                                         : "Receive"
                                             }
 
                                         </Button>
 
+                                    </td>
+                                    <td>
+                             {item.receivedParcelId && (
+  <ButtonLoading
+    onClick={() => handleDelete(item.receivedParcelId)}
+    loading={deletingId === item.receivedParcelId}
+    disabled={deletingId === item.receivedParcelId}
+    text="Reset"
+  />
+)}
+                                      
+                                            
+                                        
                                     </td>
 
                                 </tr>
