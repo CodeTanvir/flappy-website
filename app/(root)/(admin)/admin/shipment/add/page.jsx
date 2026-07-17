@@ -28,47 +28,96 @@ import slugify from "slugify";
 
 
 
-const MediaModal = dynamic(
-  () => import("@/components/Application/Admin/MediaModal"),
-  {
-    ssr: false,
-  },
-);
-const Editor = dynamic(() => import("@/components/Application/Admin/Editor"), {
-  ssr: false,
-});
+
+
 
 function AddProduct() {
   const [loading, setLoading] = useState(false);
-  const [categoryOptions, setCategoryOption] = useState([]);
- 
+  
+ const [cityOptions, setCityOptions] = useState([]);
+
+ const shipmentOptions = [
+  {
+    label: "Hand Carry",
+    value: "Hand Carry",
+  },
+  {
+    label: "Agency",
+    value: "Agency",
+  },
+];
 
   //media modal states
-  const [open, setOpen] = useState(false);
-  const [selectedMedia, setSelectedMedia] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+const [previewUrls, setPreviewUrls] = useState([]);
 
- 
+
+const handleFileChange = (e) => {
+  const files = Array.from(e.target.files);
+
+  setSelectedFiles((prev) => [...prev, ...files]);
+
+  const previews = files.map((file) => URL.createObjectURL(file));
+  setPreviewUrls((prev) => [...prev, ...previews]);
+};
+
+
+ useEffect(() => {
+  const fetchCities = async () => {
+    try {
+      const res = await fetch(
+        "https://countriesnow.space/api/v0.1/countries/cities",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            country: "China",
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.error === false) {
+        const options = data.data.map((city) => ({
+          label: city,
+          value: city,
+        }));
+
+        setCityOptions(options);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  fetchCities();
+}, []);
 
   const formSchema = zSchema.pick({
     shipmentType: true,
     date: true,
-    category: true,
-    mrp: true,
-    sellingPrice: true,
-    discountPercentage: true,
-    description: true,
+    costPerWeight: true,
+    totalWeight: true,
+    additionalCost: true,
+    city: true,
+    name: true,
+    phoneNumber:true
   });
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      slug: "",
-      category: "",
-      mrp: 0,
-      sellingPrice: 0,
-      discountPercentage: 0,
-      description: "",
+      shipmentType: "",
+    date: "",
+    costPerWeight: 0,
+    totalWeight: 0,
+    additionalCost: 0,
+    city: "",
+    name: "",
+    
     },
   });
 
@@ -97,29 +146,53 @@ function AddProduct() {
   }, [mrp, sellingPrice, form]);
 
   const onSubmit = async (values) => {
-    setLoading(true);
-    try {
-      if (selectedMedia.length <= 0) {
-        return showToast("error", "Please select at least one media");
-      }
-      const mediaIds = selectedMedia.map((media) => media._id);
-      values.media = mediaIds;
-      const { data: response } = await axios.post(
-        "/api/product/create",
-        values,
-      );
-      if (!response.success) {
-        throw new Error(response.message || "Failed to create category");
-      }
-      form.reset();
-      setSelectedMedia([]);
-      showToast("success", response.message || "Product created successfully");
-    } catch (error) {
-      showToast("error", error?.message || "Something went wrong");
-    } finally {
-      setLoading(false);
+  setLoading(true);
+
+  try {
+    if (selectedFiles.length === 0) {
+      return showToast("error", "Please select at least one document");
     }
-  };
+
+    const formData = new FormData();
+
+    // Append form values
+    Object.entries(values).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    // Append selected files
+    selectedFiles.forEach((file) => {
+      formData.append("documents", file);
+    });
+
+    const { data: response } = await axios.post(
+      "/api/shipment/create",
+      formData
+    );
+
+    if (!response.success) {
+      throw new Error(response.message || "Failed to create shipment");
+    }
+
+    form.reset();
+    setSelectedFiles([]);
+    setPreviewUrls([]);
+
+    showToast(
+      "success",
+      response.message || "Shipment created successfully"
+    );
+  } catch (error) {
+    showToast(
+      "error",
+      error.response?.data?.message ||
+        error.message ||
+        "Something went wrong"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div>
@@ -135,7 +208,7 @@ function AddProduct() {
                 <div className="mb-3">
                   <FormField
                     control={form.control}
-                    name="category"
+                    name="shipment"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
@@ -144,7 +217,7 @@ function AddProduct() {
                         <FormControl>
                           <Select
                             selected={field.value}
-                            options={categoryOptions}
+                            options={shipmentOptions}
                             setSelected={field.onChange}
                             isMulti={false}
                           />
@@ -211,7 +284,7 @@ function AddProduct() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          Selling Price<span className="text-red-500">*</span>
+                          Total Kg<span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -233,7 +306,7 @@ function AddProduct() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          Discount Percentange{" "}
+                          Additional Transport/Other Cost (RMB){" "}
                           <span className="text-red-500"> * </span>
                         </FormLabel>
                         <FormControl>
@@ -249,49 +322,118 @@ function AddProduct() {
                     )}
                   />
                 </div>
-
-               
-              </div>
-
-              <div className="md:col-span-2 border border-dashed rounded p-5 text-center">
-                <MediaModal
-                  open={open}
-                  setOpen={setOpen}
-                  selectedMedia={selectedMedia}
-                  setSelectedMedia={setSelectedMedia}
-                  isMultiple={true}
-                />
-                {selectedMedia.length > 0 && (
-                  <div
-                    className="flex
-    justify-center 
-    items-center 
-    flex-warp mb-3 
-    gap-2"
-                  >
-                    {selectedMedia?.map((media) => (
-                      <div key={media._id} className="h-24 w-24 border">
-                        <Image
-                          src={media?.url}
-                          alt={media?.alt || "Image"}
-                          height={300}
-                          width={300}
-                          className="size-full object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div
-                  onClick={() => setOpen(true)}
-                  className="bg-gray-50 dark:bg-card
-   border w-[200px] mx-auto p-5 cursor-pointer"
-                >
-                  <span className="font-semibold"> + Add Docs</span>
-                  <span> (e,g passport,ticket,visa)</span>
+ <div className="mb-3">
+                  <FormField
+                    control={form.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Departure City<span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Select
+                            selected={field.value}
+                            options={cityOptions}
+                            setSelected={field.onChange}
+                            isMulti={false}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                 <div className="mb-3">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Person/Agency Name<span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="String"
+                            placeholder="Enter Name"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                  <div className="mb-3">
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Phone Number<span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="telephone"
+                            placeholder="Enter phone number"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </div>
+
+             <div className="md:col-span-2 border border-dashed rounded p-5 text-center">
+ {previewUrls.length > 0 && (
+  <div className="flex flex-wrap justify-center gap-2 mb-3">
+    {previewUrls.map((url, index) => (
+      <div key={index} className="relative h-24 w-24 border rounded overflow-hidden">
+        <Image
+          src={url}
+          alt="Preview"
+          width={300}
+          height={300}
+          className="w-full h-full object-cover"
+        />
+
+        <button
+          type="button"
+          onClick={() => {
+            setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
+            setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+          }}
+          className="absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white text-sm hover:bg-red-600"
+        >
+          ×
+        </button>
+      </div>
+    ))}
+  </div>
+)}
+
+  <label
+    htmlFor="docs"
+    className="bg-gray-50 dark:bg-card border w-[200px] mx-auto p-5 cursor-pointer block"
+  >
+    <span className="font-semibold">+ Add Docs</span>
+    <br />
+    <span>(Passport, Ticket, Visa...)</span>
+  </label>
+
+  <input
+    id="docs"
+    type="file"
+    multiple
+    accept="image/*"
+    className="hidden"
+    onChange={handleFileChange}
+  />
+</div>
               <div className="md:col-span"></div>
               <div className="mb-3 mt-5">
                 <ButtonLoading
