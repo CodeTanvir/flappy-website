@@ -22,7 +22,6 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import slugify from "slugify";
 
 
 
@@ -31,7 +30,8 @@ import slugify from "slugify";
 
 
 
-function AddProduct() {
+
+function AddShipment() {
   const [loading, setLoading] = useState(false);
   
  const [cityOptions, setCityOptions] = useState([]);
@@ -48,9 +48,9 @@ function AddProduct() {
 ];
 
   //media modal states
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  
+const [selectedFiles, setSelectedFiles] = useState([]);
 const [previewUrls, setPreviewUrls] = useState([]);
-
 
 const handleFileChange = (e) => {
   const files = Array.from(e.target.files);
@@ -58,6 +58,7 @@ const handleFileChange = (e) => {
   setSelectedFiles((prev) => [...prev, ...files]);
 
   const previews = files.map((file) => URL.createObjectURL(file));
+
   setPreviewUrls((prev) => [...prev, ...previews]);
 };
 
@@ -109,16 +110,16 @@ const handleFileChange = (e) => {
 
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      shipmentType: "",
-    date: "",
-    costPerWeight: 0,
-    totalWeight: 0,
-    additionalCost: 0,
-    city: "",
-    name: "",
-    
-    },
+   defaultValues: {
+  shipmentType: "",
+  date: "",
+  costPerWeight: 0,
+  totalWeight: 0,
+  additionalCost: 0,
+  city: "",
+  name: "",
+  phoneNumber: "",
+}
   });
 
   const breadcrumbData = [
@@ -127,25 +128,12 @@ const handleFileChange = (e) => {
     { href: "", label: "Add Product" },
   ];
 
-  const nameValue = form.watch("name");
-  useEffect(() => {
-    const name = nameValue.toLowerCase();
-    if (name) {
-      form.setValue("slug", slugify(name));
-    }
-  }, [nameValue, form]);
+  
 
   //discount percentage calculation
-  const mrp = form.watch("mrp");
-  const sellingPrice = form.watch("sellingPrice");
-  useEffect(() => {
-    if (mrp > 0 && sellingPrice > 0) {
-      const discountPercentage = ((mrp - sellingPrice) / mrp) * 100;
-      form.setValue("discountPercentage", Math.round(discountPercentage));
-    }
-  }, [mrp, sellingPrice, form]);
+ 
 
-  const onSubmit = async (values) => {
+ const onSubmit = async (values) => {
   setLoading(true);
 
   try {
@@ -155,40 +143,30 @@ const handleFileChange = (e) => {
 
     const formData = new FormData();
 
-    // Append form values
     Object.entries(values).forEach(([key, value]) => {
       formData.append(key, value);
     });
 
-    // Append selected files
     selectedFiles.forEach((file) => {
       formData.append("documents", file);
     });
 
-    const { data: response } = await axios.post(
+    const { data } = await axios.post(
       "/api/shipment/create",
       formData
     );
 
-    if (!response.success) {
-      throw new Error(response.message || "Failed to create shipment");
+    if (!data.success) {
+      throw new Error(data.message);
     }
 
     form.reset();
     setSelectedFiles([]);
     setPreviewUrls([]);
 
-    showToast(
-      "success",
-      response.message || "Shipment created successfully"
-    );
-  } catch (error) {
-    showToast(
-      "error",
-      error.response?.data?.message ||
-        error.message ||
-        "Something went wrong"
-    );
+    showToast("success", data.message);
+  } catch (err) {
+    showToast("error", err.response?.data?.message || err.message);
   } finally {
     setLoading(false);
   }
@@ -199,7 +177,7 @@ const handleFileChange = (e) => {
       <BreadCrumb breadcrumbData={breadcrumbData} />
       <Card className="py-0 rounded shadow-sm mt-4">
         <CardHeader className="py-2  px-3 border-b">
-          <h4 className="text-xl font-semibold">Add Product</h4>
+          <h4 className="text-xl font-semibold">Add Shipment</h4>
         </CardHeader>
         <CardContent className="py-2 pt-6 pb-5">
           <Form {...form}>
@@ -208,7 +186,7 @@ const handleFileChange = (e) => {
                 <div className="mb-3">
                   <FormField
                     control={form.control}
-                    name="shipment"
+                    name="shipmentType"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
@@ -258,7 +236,7 @@ const handleFileChange = (e) => {
                 <div className="mb-3">
                   <FormField
                     control={form.control}
-                    name="mrp"
+                    name="costPerWeight"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
@@ -280,11 +258,11 @@ const handleFileChange = (e) => {
                 <div className="mb-3">
                   <FormField
                     control={form.control}
-                    name="sellingPrice"
+                    name="totalWeight"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          Total Kg<span className="text-red-500">*</span>
+                          Total Weight<span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -302,7 +280,7 @@ const handleFileChange = (e) => {
                 <div className="mb-3">
                   <FormField
                     control={form.control}
-                    name="discountPercentage"
+                    name="additionalCost"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
@@ -311,9 +289,9 @@ const handleFileChange = (e) => {
                         </FormLabel>
                         <FormControl>
                           <Input
-                            readOnly
+                            
                             type="number"
-                            placeholder="Enter Discount Percentange"
+                            placeholder="Enter Additional Cost (if have)"
                             {...field}
                           />
                         </FormControl>
@@ -368,7 +346,7 @@ const handleFileChange = (e) => {
                   <div className="mb-3">
                   <FormField
                     control={form.control}
-                    name="phone"
+                    name="phoneNumber"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
@@ -403,10 +381,12 @@ const handleFileChange = (e) => {
 
         <button
           type="button"
-          onClick={() => {
-            setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
-            setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
-          }}
+         onClick={() => {
+  URL.revokeObjectURL(previewUrls[index]);
+
+  setPreviewUrls(prev => prev.filter((_, i) => i !== index));
+  setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+}}
           className="absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white text-sm hover:bg-red-600"
         >
           ×
@@ -451,4 +431,4 @@ const handleFileChange = (e) => {
   );
 }
 
-export default AddProduct;
+export default AddShipment;

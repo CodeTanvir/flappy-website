@@ -8,7 +8,7 @@ import ProductVariantModel from "@/models/ProductVariant.model";
 export async function POST(request){
    try{
         const auth = await isAuthenticated('admin')
-        console.log(auth)
+        
         if(!auth.isAuth){
             return response(false, 403, 'Unauthorized')
         }
