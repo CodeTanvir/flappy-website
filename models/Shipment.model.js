@@ -42,7 +42,7 @@ const shipmentSchema = new mongoose.Schema({
    documents: [
   {
     type: String,
-    required: true,
+    
   },
 ],
    

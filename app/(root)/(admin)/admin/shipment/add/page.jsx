@@ -1,5 +1,6 @@
 "use client";
 import BreadCrumb from "@/components/Application/Admin/BreadCrumb";
+import DatatableWrapper from "@/components/Application/Admin/DatatableWrapper";
 import { ButtonLoading } from "@/components/Application/ButtonLoading";
 import Select from "@/components/Application/Select";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import useFetch from "@/hooks/useFetch";
+
 import { showToast } from "@/lib/showToast";
 import { zSchema } from "@/lib/zodSchema";
 import { ADMIN_DASHBOARD, ADMIN_PRODUCT_SHOW } from "@/routes/AdminPanelRoute";
@@ -20,9 +22,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-
+import { DT_SHIPMENT_ALLOCATION } from "@/lib/column";
+import { columnConfig } from "@/lib/helperFunctions";
+import ShipmentAllocationTable from "@/components/Application/Admin/ShipmentAllocationTable";
 
 
 
@@ -47,6 +51,9 @@ function AddShipment() {
   },
 ];
 
+
+
+  
   //media modal states
   
 const [selectedFiles, setSelectedFiles] = useState([]);
@@ -97,12 +104,16 @@ const handleFileChange = (e) => {
   fetchCities();
 }, []);
 
+const columns = useMemo(() => {
+  return columnConfig(DT_SHIPMENT_ALLOCATION);
+}, []);
+
   const formSchema = zSchema.pick({
     shipmentType: true,
     date: true,
     costPerWeight: true,
     totalWeight: true,
-    additionalCost: true,
+    // additionalCost: true,
     city: true,
     name: true,
     phoneNumber:true
@@ -414,6 +425,17 @@ const handleFileChange = (e) => {
     onChange={handleFileChange}
   />
 </div>
+<Card className="mt-5 py-0 rounded shadow-sm">
+  <CardHeader className="py-2 px-3 border-b">
+    <h4 className="text-xl font-semibold">
+      Shipment Allocation
+    </h4>
+  </CardHeader>
+
+  <CardContent className="p-0">
+    <ShipmentAllocationTable />
+  </CardContent>
+</Card>
               <div className="md:col-span"></div>
               <div className="mb-3 mt-5">
                 <ButtonLoading

@@ -1,6 +1,8 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunctions";
 import AllocationModel from "@/models/Allocation.model";
+import MediaModel from "@/models/Media.model";
+import OrderModel from "@/models/Order.model";
 import ProductModel from "@/models/Product.model";
 import ProductVariantModel from "@/models/ProductVariant.model";
 import PurchaseModel from "@/models/Purchase.model";
@@ -8,7 +10,8 @@ import PurchaseModel from "@/models/Purchase.model";
 ProductModel;
 ProductVariantModel;
 PurchaseModel;
-
+OrderModel;
+MediaModel
 
 export async function GET(){
 
