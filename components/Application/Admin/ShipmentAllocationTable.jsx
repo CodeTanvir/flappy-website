@@ -1,12 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { ThemeProvider } from "@mui/material";
 import { useTheme } from "next-themes";
-
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -14,23 +13,33 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { darkTheme, lightTheme } from "@/lib/materialTheme";
+import { formatBDDateTime, timeAgo } from "@/lib/dateFormatter";
 
-function ShipmentAllocationTable() {
-  const { resolvedTheme } = useTheme();
-
-  const { data, isLoading, isError, isRefetching } = useQuery({
+export default function ShipmentAllocationTable() {
+ 
+const {resolvedTheme} = useTheme()
+  const {
+    data,
+  isLoading,
+    isError,
+    isRefetching,
+  } = useQuery({
     queryKey: ["shipment-allocation"],
     queryFn: async () => {
-      const { data } = await axios.get("/api/allocation/get");
-        console.log("API RESPONSE:", data);
-      return data.data || [];
+      const { data: response } = await axios.get("/api/allocation/get");
+
+      if (!response.success) {
+        throw new Error(response.message);
+      }
+
+      return response.data;
     },
   });
 
   const columns = useMemo(
     () => [
       {
-        accessorKey: "productVariantId",
+        id: "image",
         header: "Image",
         size: 70,
         Cell: ({ row }) => {
@@ -44,105 +53,141 @@ function ShipmentAllocationTable() {
               alt="Product"
               width={50}
               height={50}
-              className="rounded-md border object-cover"
+              className="rounded border object-cover"
             />
           );
         },
       },
 
       {
-        accessorKey: "productName",
+        id: "product",
         header: "Product",
         Cell: ({ row }) => (
           <div>
-            <p className="font-medium">
-              {row.original.productVariantId?.product?.name}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {row.original.productVariantId?.color} •{" "}
-              {row.original.productVariantId?.size}
-            </p>
+            <div className="font-medium">
+              {row.original.productVariantId?.product?.name || "-"}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {row.original.productVariantId?.color || "-"} /{" "}
+              {row.original.productVariantId?.size || "-"}
+            </div>
           </div>
         ),
       },
 
       {
         accessorKey: "qty",
-        header: "Allocated Qty",
-        size: 80,
+        header: "Allocated",
       },
 
       {
-        accessorKey: "purchase",
-        header: "Purchased Qty",
-        Cell: ({ row }) => row.original.purchaseId?.totalQty ?? "-",
+        id: "purchase",
+        header: "Purchased",
+        Cell: ({ row }) =>
+          row.original.purchaseId?.totalQty ?? "-",
       },
 
       {
-        accessorKey: "order",
+        id: "order",
         header: "Order",
-        Cell: ({ row }) => row.original.orderId?.orderId ?? "-",
+        Cell: ({ row }) =>
+          row.original.orderId?.orderId ?? "-",
       },
+{
+  id: "orderAge",
+  header: "Order Age",
+  Cell: ({ row }) => {
+    const createdAt = row.original.orderId?.createdAt;
 
-      {
-        accessorKey: "location",
-        header: "Location",
-        Cell: ({ cell }) => {
-          const location = cell.getValue();
+    return (
+      <div>
+        <div className="font-medium">
+          {timeAgo(createdAt)}
+        </div>
 
-          const labels = {
-            "cn-online": "CN Online",
-            "cn-warehouse": "CN Warehouse",
-            "bd-warehouse": "BD Warehouse",
-            "in-shipment": "In Shipment",
-          };
-
-          return (
-            <Badge variant="secondary">
-              {labels[location] || location}
-            </Badge>
-          );
-        },
-      },
+        <div className="text-xs text-muted-foreground">
+          {formatBDDateTime(createdAt)}
+        </div>
+      </div>
+    );
+  },
+}
     ],
     []
   );
 
   const table = useMaterialReactTable({
-    columns,
-    data: data || [],
+  columns,
+  data: data ?? [],
+  state: {
+    isLoading,
+    showSkeletons: isLoading,
+    showProgressBars: isRefetching,
+    showAlertBanner: isError,
+  },
+  enableRowSelection: true,
+  muiSelectCheckboxProps: {
+  sx: {
+    color: resolvedTheme === "dark" ? "#d4d4d4" : "#111827",
 
-    enableRowSelection: true,
-    enableColumnOrdering: true,
-    enableStickyHeader: true,
-    enableStickyFooter: true,
-    enableDensityToggle: true,
-    enableFullScreenToggle: true,
-    enableColumnFilters: true,
-    enableGlobalFilter: true,
-
-    state: {
-      isLoading,
-      showProgressBars: isRefetching,
-      showAlertBanner: isError,
+    "&.Mui-checked": {
+      color: "#8e51ff",
     },
 
-    muiToolbarAlertBannerProps: isError
-      ? {
-          color: "error",
-          children: "Failed to load allocation data",
-        }
-      : undefined,
-
-    initialState: {
-      pagination: {
-        pageIndex: 0,
-        pageSize: 15,
-      },
+    "& .MuiSvgIcon-root": {
+      fontSize: 20,
     },
+  },
+},
+  muiTablePaperProps: {
+    sx: {
+      backgroundColor:
+        resolvedTheme === "dark" ? "#0b0a10" : "#ffffff",
+      color:
+        resolvedTheme === "dark" ? "#d4d4d4" : "#030712",
+    },
+  },
 
-    getRowId: (row) => row._id,
-  });
+  muiTableContainerProps: {
+    sx: {
+      backgroundColor:
+        resolvedTheme === "dark" ? "#0b0a10" : "#ffffff",
+    },
+  },
+
+  muiTopToolbarProps: {
+    sx: {
+      backgroundColor:
+        resolvedTheme === "dark" ? "#0b0a10" : "#ffffff",
+    },
+  },
+
+  muiBottomToolbarProps: {
+    sx: {
+      backgroundColor:
+        resolvedTheme === "dark" ? "#0b0a10" : "#ffffff",
+    },
+  },
+
+  muiTableHeadCellProps: {
+    sx: {
+      backgroundColor:
+        resolvedTheme === "dark" ? "#111827" : "#f9fafb",
+      color:
+        resolvedTheme === "dark" ? "#ffffff" : "#111827",
+    },
+  },
+
+  muiTableBodyCellProps: {
+    sx: {
+      backgroundColor:
+        resolvedTheme === "dark" ? "#0b0a10" : "#ffffff",
+      color:
+        resolvedTheme === "dark" ? "#d4d4d4" : "#111827",
+    },
+  },
+});
+ 
 
   return (
     <ThemeProvider
@@ -152,5 +197,3 @@ function ShipmentAllocationTable() {
     </ThemeProvider>
   );
 }
-
-export default ShipmentAllocationTable;

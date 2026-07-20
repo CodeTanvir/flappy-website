@@ -44,16 +44,14 @@ const allocations = await AllocationModel.find()
 
 .populate({
     path:"orderId",
-    select:"orderId"
-})
-
-.sort({
-    createdAt:-1
+    select:"orderId createdAt"
 })
 
 .lean();
 
-
+allocations.sort((a, b) => {
+  return new Date(a.orderId.createdAt) - new Date(b.orderId.createdAt);
+});
 
 return response(
     true,
