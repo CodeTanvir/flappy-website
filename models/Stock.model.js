@@ -6,31 +6,28 @@ PurchaseModel
 const stockSchema = new mongoose.Schema(
 {
    
-    purchaseId:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Purchase",
-        required:true
-    },
+   
     variantId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"ProductVariant",
         required:true
     },
 
-    stock:{
-        type:Number,
-        default:0
-    },
+    
 
     buyingPrice:{
         type:Number
     },
-    status:{
-        type:String,
-        enum:["cn","bd"],
-        default:"cn",
-        required:true
+    cnWareHouse:{
+        type:Number
+    },
+    bdWareHouse:{
+        type:Number
+    },
+    inShipment:{
+        type:Number
     }
+
 
 },{timestamps:true})
 

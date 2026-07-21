@@ -7,6 +7,7 @@ import ProductModel from "@/models/Product.model";
 import MediaModel from "@/models/Media.model";
 import ReceivedParcelModel from "@/models/ReceivedParcel.model";
 import OrderModel from "@/models/Order.model";
+import StockModel from "@/models/Stock.model";
 
 ProductVariantModel;
 ProductModel;
@@ -68,22 +69,28 @@ variants.forEach(variant => {
 });
 
 
-        /* ========= RECEIVED TOTAL ========= */
+/* ========= STOCK ========= */
 
-    const receivedParcels = await ReceivedParcelModel.find(
-  { location: "cn-warehouse" },
+const stocks = await StockModel.find(
   {
-    _id:1,
+    variantId: { $in: variantIds },
+  },
+  {
     variantId: 1,
-    receivedQty: 1,
+    cnWareHouse: 1,
+    bdWareHouse: 1,
+    inShipment: 1,
   }
 ).lean();
-const receivedMap = new Map(
-  receivedParcels.map(parcel => [
-    parcel.variantId.toString(),
+
+const stockMap = new Map(
+  stocks.map((stock) => [
+    stock.variantId.toString(),
     {
-      _id: parcel._id,
-      receivedQty: parcel.receivedQty,
+      totalReceived:
+        (stock.cnWareHouse || 0) +
+        (stock.bdWareHouse || 0) +
+        (stock.inShipment || 0),
     },
   ])
 );
@@ -91,14 +98,13 @@ const receivedMap = new Map(
 const formatted = purchases.map(item => {
   const variant = variantMap.get(item._id.toString());
 
- const received = receivedMap.get(item._id.toString());
+ const stock = stockMap.get(item._id.toString());
 
-const totalReceived = received?.receivedQty || 0;
-const receivedParcelId = received?._id || null;
+const totalReceived = stock?.totalReceived || 0;
 
   return {
     
-     receivedParcelId,
+     
   variantId: item._id,
    
     product: {

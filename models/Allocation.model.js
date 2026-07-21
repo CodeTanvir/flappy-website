@@ -29,11 +29,7 @@ const allocationSchema = new mongoose.Schema(
             required: true
         },
 
-        location:{
-        type:String,
-        enum:["cn-online","cn-warehouse","bd-warehouse","in-shipment"],
-        default:"cn-online"
-    },
+     
 
 
     },
