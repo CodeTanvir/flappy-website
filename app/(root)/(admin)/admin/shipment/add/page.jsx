@@ -27,6 +27,8 @@ import { useForm } from "react-hook-form";
 import { DT_SHIPMENT_ALLOCATION } from "@/lib/column";
 import { columnConfig } from "@/lib/helperFunctions";
 import ShipmentAllocationTable from "@/components/Application/Admin/ShipmentAllocationTable";
+import ShipmentProductTable from "@/components/Application/Admin/ShipmentProductTable";
+import { useQueryClient } from "@tanstack/react-query";
 
 
 
@@ -36,8 +38,9 @@ import ShipmentAllocationTable from "@/components/Application/Admin/ShipmentAllo
 
 
 function AddShipment() {
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
-  
+  const [allocation, setAllocation] = useState({});
  const [cityOptions, setCityOptions] = useState([]);
 
  const shipmentOptions = [
@@ -58,6 +61,7 @@ function AddShipment() {
   
 const [selectedFiles, setSelectedFiles] = useState([]);
 const [previewUrls, setPreviewUrls] = useState([]);
+
 
 const handleFileChange = (e) => {
   const files = Array.from(e.target.files);
@@ -104,9 +108,7 @@ const handleFileChange = (e) => {
   fetchCities();
 }, []);
 
-const columns = useMemo(() => {
-  return columnConfig(DT_SHIPMENT_ALLOCATION);
-}, []);
+
 
   const formSchema = zSchema.pick({
     shipmentType: true,
@@ -157,6 +159,10 @@ const columns = useMemo(() => {
     Object.entries(values).forEach(([key, value]) => {
       formData.append(key, value);
     });
+    formData.append(
+  "allocation",
+  JSON.stringify(allocation)
+);
 
     selectedFiles.forEach((file) => {
       formData.append("documents", file);
@@ -170,7 +176,11 @@ const columns = useMemo(() => {
     if (!data.success) {
       throw new Error(data.message);
     }
+await queryClient.invalidateQueries({
+  queryKey: ["shipment-product"],
+});
 
+setAllocation({});
     form.reset();
     setSelectedFiles([]);
     setPreviewUrls([]);
@@ -433,7 +443,8 @@ const columns = useMemo(() => {
   </CardHeader>
 
   <CardContent className="p-0">
-    <ShipmentAllocationTable />
+    <ShipmentProductTable  allocation={allocation}
+  setAllocation={setAllocation}/>
   </CardContent>
 </Card>
               <div className="md:col-span"></div>
@@ -441,7 +452,7 @@ const columns = useMemo(() => {
                 <ButtonLoading
                   loading={loading}
                   type="submit"
-                  text="Add Product"
+                  text="Add Shipment"
                   className=" cursor-pointer"
                 />
               </div>

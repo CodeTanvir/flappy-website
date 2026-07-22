@@ -1,3 +1,6 @@
+import mongoose from "mongoose";
+import { v2 as cloudinary } from "cloudinary";
+
 import { connectDB } from "@/lib/databaseConnection";
 import {
   catchError,
@@ -5,8 +8,10 @@ import {
   response,
 } from "@/lib/helperFunctions";
 import { zSchema } from "@/lib/zodSchema";
-import shipmentModel from "@/models/Shipment.model";
-import { v2 as cloudinary } from "cloudinary";
+
+import ShipmentModel from "@/models/Shipment.model";
+import ShipmentAllocationModel from "@/models/ShipmentAllocation.model";
+import StockModel from "@/models/Stock.model";
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -15,6 +20,8 @@ cloudinary.config({
 });
 
 export async function POST(request) {
+  const session = await mongoose.startSession();
+ const uploadedImages = [];
   try {
     const auth = await isAuthenticated("admin");
 
@@ -25,6 +32,10 @@ export async function POST(request) {
     await connectDB();
 
     const formData = await request.formData();
+
+    const allocation = JSON.parse(
+      formData.get("allocation") || "{}"
+    );
 
     const payload = {
       shipmentType: formData.get("shipmentType"),
@@ -54,41 +65,175 @@ export async function POST(request) {
       return response(
         false,
         400,
-        "Invalid or missing fields",
+        "Invalid fields",
         validate.error
       );
     }
 
-    const files = formData.getAll("documents");
-
-    if (files.length === 0) {
-      return response(false, 400, "Please upload at least one document");
+    if (Object.keys(allocation).length === 0) {
+      return response(false, 400, "No products selected");
     }
 
-    const documentUrls = [];
+    const files = formData.getAll("documents");
+
+    if (!files.length) {
+      return response(false, 400, "Upload shipment documents");
+    }
+
+    // --------------------------
+    // Validate stock first
+    // --------------------------
+
+    const variantIds = Object.keys(allocation);
+
+    const stocks = await StockModel.find({
+      variantId: { $in: variantIds },
+    }).lean();
+
+    const stockMap = new Map();
+
+    stocks.forEach((stock) => {
+      stockMap.set(stock.variantId.toString(), stock);
+    });
+
+    for (const [variantId, qty] of Object.entries(allocation)) {
+      const sendQty = Number(qty);
+
+      if (sendQty <= 0) {
+        return response(false, 400, "Invalid quantity");
+      }
+
+      const stock = stockMap.get(variantId);
+
+      if (!stock) {
+        return response(false, 400, "Stock not found");
+      }
+
+      if (stock.cnWareHouse < sendQty) {
+        return response(
+          false,
+          400,
+          "Insufficient China warehouse stock"
+        );
+      }
+    }
+
+    // --------------------------
+    // Upload documents
+    // --------------------------
+
+   
 
     for (const file of files) {
       const bytes = await file.arrayBuffer();
+
       const buffer = Buffer.from(bytes);
 
-      const base64 = buffer.toString("base64");
+      const uploaded = await cloudinary.uploader.upload(
+        `data:${file.type};base64,${buffer.toString("base64")}`,
+        {
+          folder: "shipment-documents",
+        }
+      );
 
-      const dataURI = `data:${file.type};base64,${base64}`;
-
-      const uploaded = await cloudinary.uploader.upload(dataURI, {
-        folder: "shipment-documents",
-      });
-
-      documentUrls.push(uploaded.secure_url);
+      uploadedImages.push(uploaded);
     }
 
-    const shipment = await shipmentModel.create({
-      ...validate.data,
-      documents: documentUrls,
-    });
+    const documentUrls = uploadedImages.map(
+      (item) => item.secure_url
+    );
 
-    return response(true, 201, "Shipment created successfully", shipment);
+    // --------------------------
+    // Transaction starts
+    // --------------------------
+
+    session.startTransaction();
+
+    const shipment = await ShipmentModel.create(
+      [
+        {
+          ...validate.data,
+          documents: documentUrls,
+        },
+      ],
+      { session }
+    );
+
+    const shipmentId = shipment[0]._id;
+
+  const products = [];
+
+for (const [variantId, qty] of Object.entries(allocation)) {
+  products.push({
+    variantId,
+    qty: Number(qty),
+  });
+}
+if (products.length === 0) {
+  throw new Error("No products selected.");
+}
+await ShipmentAllocationModel.create(
+  [
+    {
+      shipmentId,
+      products,
+    },
+  ],
+  { session }
+);
+    for (const [variantId, qty] of Object.entries(allocation)) {
+     const result = await StockModel.updateOne(
+  {
+    variantId,
+    cnWareHouse: { $gte: Number(qty) },
+  },
+  {
+    $inc: {
+      cnWareHouse: -Number(qty),
+      inShipment: Number(qty),
+    },
+  },
+  { session }
+);
+
+if (result.modifiedCount !== 1) {
+  throw new Error("Insufficient stock.");
+}
+    }
+
+    await session.commitTransaction();
+
+    session.endSession();
+
+    return response(
+      true,
+      201,
+      "Shipment created successfully",
+      shipment[0]
+    );
   } catch (error) {
-    return catchError(error);
+
+  if (session.inTransaction()) {
+    await session.abortTransaction();
   }
+
+  // Delete uploaded images if anything fails
+  if (uploadedImages.length > 0) {
+
+    await Promise.allSettled(
+
+      uploadedImages.map((image) =>
+        cloudinary.uploader.destroy(
+          image.public_id
+        )
+      )
+
+    );
+
+  }
+
+  session.endSession();
+
+  return catchError(error);
+}
 }

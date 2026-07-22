@@ -26,7 +26,7 @@ import { MoreHorizontal } from "lucide-react";
 import StockModal from "@/components/Application/Admin/StockModal";
 
 
-export default function ReceivedParcel() {
+export default function Stocks() {
 const queryClient = useQueryClient()
 const [open, setOpen] = useState(false);
 const [selectedProduct, setSelectedProduct] = useState(null);

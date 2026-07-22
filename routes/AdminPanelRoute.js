@@ -49,8 +49,8 @@ export const ADMIN_TRASH = '/admin/trash';
 //Allocation
 export const ADMIN_ALLOCATION = '/admin/allocation'
 
-//Recieved Parcel
-export const ADMIN_RECIEVED_PARCEL = '/admin/recieve'
+//STOCKS
+export const ADMIN_STOCKS = '/admin/stocks'
 
 //Shipment
 export const ADMIN_ADD_SHIPMENT = '/admin/shipment/add'
