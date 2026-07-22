@@ -8,7 +8,6 @@ import ProductVariantModel from "@/models/ProductVariant.model";
 import z from "zod";
 
 export async function POST(request) {
-  console.log(request)
   try {
     await connectDB();
 
@@ -141,12 +140,12 @@ if(paymentMethod === 'bkash'){
         : undefined;
 
     // ────────────────────────────────────────────────
-    // Create order (with retry on duplicate orderId)
+    // Create order (with bounded retry on duplicate orderId)
     // ────────────────────────────────────────────────
     let order;
     let created = false;
 
-    while (!created) {
+    for (let attempt = 0; attempt < 5 && !created; attempt += 1) {
       try {
         order = await OrderModel.create({
           userId,
@@ -164,17 +163,19 @@ if(paymentMethod === 'bkash'){
           totalAmount: recalculatedTotalAmount,
           paymentMethod,
           bkash,
-         
         });
 
         created = true;
       } catch (err) {
         if (err.code === 11000) {
-          // Duplicate key (orderId) → retry
           continue;
         }
         throw err;
       }
+    }
+
+    if (!created) {
+      throw new Error("Failed to create order after multiple attempts.");
     }
 
     // ────────────────────────────────────────────────

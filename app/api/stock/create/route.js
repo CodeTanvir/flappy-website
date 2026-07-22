@@ -1,5 +1,3 @@
-// app/api/stock/create/route.js
-
 import { connectDB } from "@/lib/databaseConnection";
 import {
   catchError,
@@ -11,20 +9,24 @@ import StockModel from "@/models/Stock.model";
 
 export async function POST(request) {
   try {
+    await connectDB();
+
     const auth = await isAuthenticated("admin");
 
     if (!auth.isAuth) {
       return response(false, 403, "Unauthorized");
     }
 
-    await connectDB();
-
     const {
       variantId,
       buyingPrice,
-      receivedQty,
-      location,
+      cnWareHouse = 0,
+      bdWareHouse = 0,
     } = await request.json();
+
+    if (!variantId) {
+      return response(false, 400, "Variant ID is required");
+    }
 
     let stock = await StockModel.findOne({ variantId });
 
@@ -40,22 +42,18 @@ export async function POST(request) {
 
     stock.buyingPrice = buyingPrice;
 
-    if (location === "cn-warehouse") {
-      stock.cnWareHouse += Number(receivedQty);
-    }
-
-    if (location === "bd-warehouse") {
-      stock.bdWareHouse += Number(receivedQty);
-    }
+    stock.cnWareHouse += Number(cnWareHouse);
+    stock.bdWareHouse += Number(bdWareHouse);
 
     await stock.save();
 
     return response(
       true,
       200,
-      "Stock updated successfully",
+      "Stock added successfully",
       stock
     );
+
   } catch (error) {
     return catchError(error);
   }

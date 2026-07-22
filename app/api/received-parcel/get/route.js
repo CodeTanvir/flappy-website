@@ -79,7 +79,7 @@ const stocks = await StockModel.find(
     variantId: 1,
     cnWareHouse: 1,
     bdWareHouse: 1,
-    inShipment: 1,
+    
   }
 ).lean();
 
@@ -87,10 +87,8 @@ const stockMap = new Map(
   stocks.map((stock) => [
     stock.variantId.toString(),
     {
-      totalReceived:
-        (stock.cnWareHouse || 0) +
-        (stock.bdWareHouse || 0) +
-        (stock.inShipment || 0),
+      cnWareHouse: stock.cnWareHouse,
+      bdWareHouse: stock.bdWareHouse,
     },
   ])
 );
@@ -100,8 +98,8 @@ const formatted = purchases.map(item => {
 
  const stock = stockMap.get(item._id.toString());
 
-const totalReceived = stock?.totalReceived || 0;
-
+const cnWareHouse = stock?.cnWareHouse || 0;
+const bdWareHouse = stock?.bdWareHouse || 0;
   return {
     
      
@@ -115,8 +113,9 @@ const totalReceived = stock?.totalReceived || 0;
       image: variant?.media?.[0]?.secure_url || null,
     },
     totalQty: item.totalQty,
-    totalReceived,
-    remainingQty: item.totalQty - totalReceived,
+   
+    cnWareHouse,
+    bdWareHouse,
     createdAt: item.createdAt,
   };
 });

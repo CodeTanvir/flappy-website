@@ -87,19 +87,26 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Only generate one ID
+// Only generate one ID with a bounded retry loop
 orderSchema.pre("save", async function (next) {
   if (!this.orderId) {
     let isUnique = false;
-    while (!isUnique) {
+
+    for (let attempt = 0; attempt < 5 && !isUnique; attempt += 1) {
       const newId = generateOrderId();
       const existing = await mongoose.models.Order?.findOne({ orderId: newId });
+
       if (!existing) {
         this.orderId = newId;
         isUnique = true;
       }
     }
+
+    if (!isUnique) {
+      return next(new Error("Unable to generate a unique order ID."));
+    }
   }
+
   next();
 });
 

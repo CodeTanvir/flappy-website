@@ -4,16 +4,13 @@ import { zSchema } from "@/lib/zodSchema";
 import UserModel from "@/models/User.model";
 
 export async function PUT(request){
-    console.log(request)
     try{
         await connectDB();
         const payload = await request.json();
-        console.log(payload)
         const validationSchema = zSchema.pick({
             email:true,password:true
         });
         const validatedData = validationSchema.safeParse(payload);
-        console.log(validatedData)
         if(!validatedData.success){
             return response(false, 401, 
                 "Invalid or missing input field",validatedData.error)
