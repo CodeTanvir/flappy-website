@@ -119,10 +119,12 @@ const deleteMutation = useDeleteMutation(queryKey, deleteEndPoint)
        url.searchParams.set("deleteType",deleteType);
 
       const { data: response } = await axios.get(url.href);
+      
       return response;
     },
     placeholderData: keepPreviousData,
   });
+  
 
   const table = useMaterialReactTable({
     columns: columnsConfig,
@@ -248,7 +250,7 @@ renderRowActionMenuItems: enableRowActions
     )
 
   });
-
+console.log(table.getRowModel().rows);
 
   return (
     <MaterialReactTable table={table}/>

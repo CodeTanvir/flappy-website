@@ -16,10 +16,9 @@ import { DT_SHIPMENT_COLUMN } from "@/lib/column";
 import { columnConfig } from "@/lib/helperFunctions";
 
 import {
+    ADMIN_ALL_SHIPMENT,
   ADMIN_DASHBOARD,
-  ADMIN_SHIPMENT_ADD,
-  ADMIN_SHIPMENT_EDIT,
-  ADMIN_SHIPMENT_SHOW,
+ 
   ADMIN_TRASH,
 } from "@/routes/AdminPanelRoute";
 
@@ -29,7 +28,7 @@ const breadcrumbData = [
     label: "Home",
   },
   {
-    href: ADMIN_SHIPMENT_SHOW,
+    href: ADMIN_ALL_SHIPMENT,
     label: "Shipment",
   },
 ];
@@ -38,6 +37,7 @@ function ShowShipment() {
   const columns = useMemo(() => {
     return columnConfig(DT_SHIPMENT_COLUMN);
   }, []);
+ 
 
   const action = useCallback(
     (row, deleteType, handleDelete) => {

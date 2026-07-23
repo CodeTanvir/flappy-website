@@ -55,6 +55,6 @@ const shipmentSchema = new mongoose.Schema({
 },{timestamps:true});
 
 
-const shipmentModel = mongoose.models.Shipment || mongoose.model('Shipment',shipmentSchema,'shipment');
+const ShipmentModel = mongoose.models.Shipment || mongoose.model('Shipment',shipmentSchema,'shipment');
 
-export default shipmentModel;
+export default ShipmentModel;
