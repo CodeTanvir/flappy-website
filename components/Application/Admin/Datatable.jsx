@@ -30,6 +30,7 @@ function Datatable({
   deleteType,
   trashView,
   createAction,
+   enableRowActions = true
 }) {
   //filter sorting and pagination states
   const [columnFilters, setColumnFilters] = useState([]);
@@ -228,9 +229,13 @@ const deleteMutation = useDeleteMutation(queryKey, deleteEndPoint)
       )
     },
 
-    enableRowActions:true,
-    positionActionsColumn:'last',
-    renderRowActionMenuItems: ({row}) => createAction(row, deleteType, handleDelete),
+    enableRowActions,
+
+positionActionsColumn: "last",
+
+renderRowActionMenuItems: enableRowActions
+  ? ({ row }) => createAction(row, deleteType, handleDelete)
+  : undefined,
 
     renderTopToolbarCustomActions : ({table}) => (
       <Tooltip>

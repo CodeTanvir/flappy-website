@@ -16,6 +16,7 @@ function DatatableWrapper({
   deleteType,
   trashView,
   createAction,
+  enableRowActions
 }) {
     const {resolvedTheme} = useTheme();
     const [mounted, setMounted] = useState(false);
@@ -36,6 +37,7 @@ function DatatableWrapper({
         deleteType={deleteType}
         trashView={trashView}
         createAction={createAction}
+        enableRowActions={enableRowActions}
         />
       </ThemeProvider>
     )

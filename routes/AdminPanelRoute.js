@@ -54,3 +54,4 @@ export const ADMIN_STOCKS = '/admin/stocks'
 
 //Shipment
 export const ADMIN_ADD_SHIPMENT = '/admin/shipment/add'
+export const ADMIN_ALL_SHIPMENT = "/admin/shipment"
